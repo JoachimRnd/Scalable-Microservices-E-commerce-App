@@ -23,8 +23,8 @@ This section gives you a list of pointers to other tutorials you can follow to b
       1. [How to Install Local Packages](https://docs.npmjs.com/getting-started/installing-npm-packages-locally);
       1. [Working with package.json](https://docs.npmjs.com/getting-started/using-a-package.json).
 
-- The front-end is based on [React](https://reactjs.org/) a Javascript framework for building dynamic web interfaces.
-  - :pencil: **Note.** Start reading its [official documentation](https://reactjs.org/docs/hello-world.html), and try its [interactive tutorial](https://reactjs.org/tutorial/tutorial.html).
+- The front-end is based on [Svelte](https://svelte.dev/) a Javascript framework for building dynamic web interfaces.
+  - :pencil: **Note.** Start reading its [official documentation](https://svelte.dev/docs/svelte-components), and try its [interactive tutorial](https://learn.svelte.dev/tutorial/welcome-to-svelte).
 
 **Do not panic**, all these documentation may seem a lot of content but it is an investment that will reward you later.
 
@@ -32,13 +32,14 @@ This section gives you a list of pointers to other tutorials you can follow to b
 
 ## Development
 
-In the following weeks, you will adapt the provided code (front-end and back-end) to complete the requested tasks for the project. In order to have one private repository per team member, you are asked to create a copy of the course repository in your GitHub account; this is commonly knows as a *GitHub fork*. To do so, click on [this link](https://github.com/CloudLargeScale-UCLouvain/LINFO2145-2022-2023) to show the repository in your Web browser and click on the *Fork* button below your GitHub avatar.
+In the following weeks, you will adapt the provided code (front-end and back-end) to complete the requested tasks for the project. In order to have one private repository per team member, you are asked to create a copy of the course repository in your GitHub account; this is commonly knows as a *GitHub fork*. To do so, click on [this link](https://github.com/CloudLargeScale-UCLouvain/LINFO2145-2023-2024) to show the repository in your Web browser and click on the *Fork* button below your GitHub avatar.
 
 :warning: **Important:
 Only one private repository per team will be graded** and considered as deliverable for the project. Be sure to have every team member as well as the teaching assistants as contributors. These are the logins of the assistants:
 
-- **guillaumerosinosky** - Guillaume Rosinosky
 - **donaschmi** - Donatien Schmitz
+- **YinanTsao** - Yinan Cao
+- **samybtt** - Samy Bettaieb
 
 ### Working in your Virtual Machine (VM)
 
