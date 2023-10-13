@@ -1,0 +1,24 @@
+FRONTEND : 
+
+
+docker build -t scapp-frontend .
+
+
+docker run -d -p 3000:3000 scapp-frontend
+
+docker stop CONTAINER_ID
+
+
+BACKEND :
+
+docker build -t scapp-auth .
+
+
+docker run -d -p 3001:80 scapp-auth
+
+
+Get the logs :
+docker logs CONTAINER_ID
+
+
+
