@@ -19,7 +19,7 @@ As the project is split in **two parts**, there will be **two deliverables**:
 
 ## First deliverable: Shopping-cart application
 
-The first deliverable is due **TO BE ANNOUNCED (end of november), 2023, 13:45** (before the lecture).
+The first deliverable is due **November 29, 2023, 13:45** (before the lecture).
 **There will be no extension.**
 
 The deliverable should be provided to us as a link to your private fork of the repository (one link per group only!) together with the identifier of the last commit we should look at.
@@ -129,7 +129,7 @@ You will get better feedback if you send a link to your code in advance by email
 
 ## Second deliverable: recommendation service
 
-This deliverable is due **TO BE ANNOUNCED (last day of semester), 2023, 23:59**. **There will be no extension.**
+This deliverable is due **December 23, 2023, 23:59**. **There will be no extension.**
 
 The deliverable should be provided to us as a link to your private fork of the repository together with the identifier of the last commit we should look at.
 _If the provided commit's date on GitHub is after the deadline, we will consider the latest commit before the deadline instead._
