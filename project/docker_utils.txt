@@ -30,3 +30,7 @@ STORAGE :
 docker build -t kv-storage-system .
 
 docker run -d -p 3002:5984 --name users-db kv-storage-system
+
+Instacart : 
+
+docker build -t instacart-sample .
