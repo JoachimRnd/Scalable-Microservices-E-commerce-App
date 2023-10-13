@@ -7,7 +7,7 @@ COPY package.json ./
 RUN npm install
 COPY . ./
 
-ENV PUBLIC_AUTH_SERVICE_URL=http://localhost:3001
+ENV PUBLIC_AUTH_SERVICE_URL=http://192.168.56.101:3001
 
 RUN npm run build
 
