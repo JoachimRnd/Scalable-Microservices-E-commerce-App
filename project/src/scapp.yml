@@ -3,7 +3,7 @@ services:     # list all services for your application
   # database of users
   users-db:
     # image name
-    image: kv-storage-system:latest
+    image: ${DOCKER_ID}/kv-storage-system:latest
     ports: ["3001:5984"]
     deploy:
       # deploy only one instance of this service
@@ -14,7 +14,7 @@ services:     # list all services for your application
     networks: [ "scapp-net" ]
   # server that listens HTTP requests
   users-daemon:
-    image: scapp-auth:latest
+    image: ${DOCKER_ID}/scapp-auth:latest
     # link both services (same effect of option --link in docker run)
     depends_on: [ "users-db" ]
     # expose port number 3000 of host running this service
@@ -26,7 +26,7 @@ services:     # list all services for your application
     networks: [ "scapp-net" ]
   # Docker GUI for swarms
   visualizer:
-    image: bretfisher/visualizer:stable
+    image: dockersamples/visualizer:latest
     ports: [ "80:8080" ]
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"

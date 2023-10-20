@@ -3,7 +3,7 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/artillery
 
-RUN apt-get update && apt-get install -y curl
+RUN apk update && apk add curl
 RUN npm install artillery
 
 # let NPM packages be called anywhere within the container
