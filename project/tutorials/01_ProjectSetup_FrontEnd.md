@@ -43,7 +43,7 @@ The list of dependencies is in the JSON file `package.json`.
 The following Dockerfile lets you build an image of the front-end.
 
 ``` dockerfile
-FROM node:20 AS build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
