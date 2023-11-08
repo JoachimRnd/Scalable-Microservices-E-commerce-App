@@ -1,10 +1,15 @@
+VBoxManage startvm myvm-clone --type headless
+
+GET THE IP address of the vm from windows : 
+VBoxManage guestcontrol myvm-clone --username user --password user run --exe /bin/ip -- ip address show
+
 FRONTEND : 
 
 
 docker build -t scapp-frontend .
 
 
-docker run -d -p 3000:3000 scapp-frontend
+1. docker run -d -p 3000:3000 scapp-frontend
 
 docker stop CONTAINER_ID
 
@@ -17,6 +22,7 @@ docker run -d -p 3001:80 scapp-auth
 
 With Couch-DB :
 
+3. docker rm auth-service
 docker run -d -p 3001:80 --name auth-service --link users-db scapp-auth
 
 
@@ -29,8 +35,19 @@ STORAGE :
 
 docker build -t kv-storage-system .
 
+2. docker rm users-db
 docker run -d -p 3002:5984 --name users-db kv-storage-system
 
 Instacart : 
 
 docker build -t instacart-sample .
+
+
+Relancer les services ->
+dans folder src
+
+docker stack deploy -c scapp.yml scapp
+
+Pour voir les running services 
+
+docker stack services scapp
