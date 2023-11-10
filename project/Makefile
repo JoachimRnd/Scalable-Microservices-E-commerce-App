@@ -33,7 +33,7 @@ storage-push:
 
 auth-build:
 	@echo -e "${GREEN}Buidling auth docker image...${NC}"
-	@docker build -t scapp-auth src/back-end/auth
+	@docker build -t scapp-auth src/back-end/users
 
 auth-push:
 	@docker tag scapp-auth ${DOCKER_ID}/scapp-auth
