@@ -46,8 +46,20 @@ docker build -t instacart-sample .
 Relancer les services ->
 dans folder src
 
+docker swarm init --advertise-addr IP_OF_VM_LEADER
+
 docker stack deploy -c scapp.yml scapp
 
 Pour voir les running services 
 
 docker stack services scapp
+
+
+
+Update après modifications
+
+docker service update scapp_frontend
+
+docker stack rm scapp
+
+docker swarm leave --force
