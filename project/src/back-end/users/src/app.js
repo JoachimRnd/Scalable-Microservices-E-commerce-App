@@ -31,4 +31,28 @@ app.get('/user/:username/:password', (req, res) => {
     })
 })
 
+
+app.post('/checkout', (req, res) => {
+  var checkout = req.body.checkout
+  console.log("checkout test")
+  console.log(checkout)
+  //log(`Creating a new user (${usr}) identified with "${usrPassw}"`)
+  
+  
+  return db.createCheckout(checkout)
+    .then((token) => {
+      res.status(200).json({ status: 'success', token })
+    })
+    .catch((err) => {
+      res.status(409).json({ status: 'error', message: String(err) })
+    })
+})
+
+
+
+
+
+
+
+
 module.exports = app

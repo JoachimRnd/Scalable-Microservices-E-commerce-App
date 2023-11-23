@@ -2,11 +2,17 @@
 	import { totalPrice, totalQuantity } from '@stores/cart';
 	import { cart } from '@stores/cart';
 	import { onMount } from 'svelte';
+	import axios from "axios";
+	import { addToast } from '@stores/toasts';
 
 	let prevCheckout: any[];
 
 	onMount(async () => {
 		prevCheckout = JSON.parse(window.localStorage.getItem('checkout')) || [];
+
+		console.log("get commandes")
+		console.log(window.localStorage.getItem('checkout'))
+
 	});
 
 	function handleCheckout() {
@@ -18,9 +24,39 @@
 				date: new Date().toLocaleDateString('fr')
 			}
 		};
+		console.log("make a checkout")
+		console.log("checkout")
 		prevCheckout = [...prevCheckout, checkout];
+		//todo call back to checkout and remove cart item
+
+		axios
+		.post(`${url}/checkout`, { checkout })
+		.then((res) => {
+			console.log("axios then");
+		  addToast({
+			message: "Checkout completed",
+			type: "success",
+			dismissible: true,
+			timeout: 3000,
+		  });
+		})
+		.catch((err) => {
+		  addToast({
+			message: "Checkout completed with an error.",
+			type: "error",
+			dismissible: true,
+			timeout: 3000,
+		  });
+		});
+		
+
+
+
 		window.localStorage.setItem('checkout', JSON.stringify(prevCheckout));
+		
+		
 		window.sessionStorage.removeItem('cart');
+		
 		cart.update((old) => []);
 	}
 </script>

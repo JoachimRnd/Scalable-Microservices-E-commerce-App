@@ -46,3 +46,22 @@ swarm-deploy:
 swarm-remove:
 	@echo -e "${GREEN}Removing stack from swarm...${NC}"
 	@docker stack rm scapp
+
+swarm-list:
+	@echo -e "${GREEN}Listing scapp services from swarm...${NC}"
+	@docker stack services scapp
+
+swarm-leave:
+	@echo -e "${GREEN}Leaving swarm...${NC}"
+	@docker swarm leave --force
+
+swarm-init:
+	@echo -e "${GREEN}Swarm initiation...${NC}"
+	@docker swarm init --advertise-addr 192.168.56.101
+	@docker network create --driver overlay --attachable scapp-net
+
+reload: frontend-build frontend-push storage-build storage-push auth-build auth-push
+	@echo -e "${GREEN}Reloading stack...${NC}"
+	@docker service update --force scapp_users-db
+	@docker service update --force scapp_users-daemon
+	@docker service update --force scapp_frontend

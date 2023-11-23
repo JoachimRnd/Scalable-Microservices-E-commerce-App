@@ -1,17 +1,25 @@
 VBoxManage startvm myvm-clone --type headless
+VBoxManage startvm myvm-elastic --type headless
 
 GET THE IP address of the vm from windows : 
 VBoxManage guestcontrol myvm-clone --username user --password user run --exe /bin/ip -- ip address show
 
 FRONTEND : 
 
-
 docker build -t scapp-frontend .
-
 
 1. docker run -d -p 3000:3000 scapp-frontend
 
 docker stop CONTAINER_ID
+
+
+STORAGE :
+
+docker build -t kv-storage-system .
+
+2. docker rm users-db
+docker run -d -p 3002:5984 --name users-db kv-storage-system
+
 
 BACKEND :
 
@@ -26,27 +34,25 @@ With Couch-DB :
 docker run -d -p 3001:80 --name auth-service --link users-db scapp-auth
 
 
+
 Get the logs :
 
-docker logs CONTAINER_ID
+docker logs CONTAINER_IDVBoxManage guestcontrol myvm-clone --username user --password user run --exe /bin/ip -- ip address show
 
 
-STORAGE :
-
-docker build -t kv-storage-system .
-
-2. docker rm users-db
-docker run -d -p 3002:5984 --name users-db kv-storage-system
-
-Instacart : 
-
-docker build -t instacart-sample .
 
 
-Relancer les services ->
-dans folder src
 
-docker swarm init --advertise-addr IP_OF_VM_LEADER
+
+
+
+
+
+SWARM :
+
+docker swarm init --advertise-addr 192.168.56.101
+
+docker network create --driver overlay --attachable scapp-net
 
 docker stack deploy -c scapp.yml scapp
 

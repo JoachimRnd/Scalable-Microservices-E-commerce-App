@@ -33,7 +33,32 @@ function getUser (usrName, passw) {
   })
 }
 
+function createCheckout (checkout) {
+  console.log("create checkout in crud js")
+  console.log(checkout)
+  
+  /*return new Promise((resolve, reject) => {
+    users.insert(
+      // 1st argument of nano.insert()
+      { 'passw': bcrypt.hashSync(passw, bcrypt.genSaltSync()) },
+      usrName, // 2nd argument of nano.insert()
+      // callback to execute once the request to the DB is complete
+      (error, success) => {
+        if (success) {
+          resolve(tku.encodeToken(usrName))
+        } else {
+          reject(
+            new Error(`In the creation of user (${usrName}). Reason: ${error.reason}.`)
+          )
+        }
+      }
+    )
+  })*/
+}
+
+
 module.exports = {
   createUser,
-  getUser
+  getUser,
+  createCheckout
 }
