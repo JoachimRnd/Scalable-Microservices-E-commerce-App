@@ -10,6 +10,11 @@ function encodeToken (user) {
   return jwt.encode(playload, process.env.TOKEN_SECRET)
 }
 
+function decodeToken(token) {
+  return jwt.decode(token, process.env.TOKEN_SECRET);
+}
+
 module.exports = {
-  encodeToken
+  encodeToken,
+  decodeToken
 }

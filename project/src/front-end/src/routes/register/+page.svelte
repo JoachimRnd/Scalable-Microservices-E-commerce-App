@@ -18,7 +18,7 @@
 			console.log("axios then");
 		  $user.isLogged = true;
 		  $user.isAdmin = false;
-		  window.localStorage.setItem("auth", JSON.stringify($user));
+		  window.localStorage.setItem("auth", JSON.stringify({ ...$user, token: res.data.token }));
 		  addToast({
 			message: "Registration succeeded: Welcome!",
 			type: "success",

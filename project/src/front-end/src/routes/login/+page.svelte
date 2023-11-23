@@ -19,8 +19,7 @@
 		.then((res) => {
 			$user.isLogged = true;
 			$user.isAdmin = false;
-			console.log(res);
-			window.localStorage.setItem("auth", JSON.stringify($user));
+			window.localStorage.setItem("auth", JSON.stringify({ ...$user, token: res.data.token }));
 			addToast({
 				message: `Welcome back ${username}!`,
 				type: "success",

@@ -20,13 +20,22 @@
 #      REVISION:  ---
 #===============================================================================
 if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
-  echo "Wait (indefenitly) until the DB creation (name: ${DB_NAME})."
-  echo "The DB URL is: ${DB_URL}"
-  until curl --request PUT ${DB_URL} ; do
-    echo -e "\t DB (${DB_NAME}) wasn't created - trying again later..."
+  echo "Wait (indefinitely) until the DB creation (name: ${DB_USERS})."
+  echo "The DB URL is: ${DB_URL_USERS}"
+  until curl --request PUT ${DB_URL_USERS} ; do
+    echo -e "\t DB (${DB_USERS}) wasn't created - trying again later..."
     sleep 2
   done
-  echo "DB (${DB_NAME}) was created!"
+  echo "DB (${DB_USERS}) was created!"
+
+  echo "Wait (indefinitely) until the DB creation (name: ${DB_ORDERS})."
+  echo "The DB URL is: ${DB_URL_ORDERS}"
+  until curl --request PUT ${DB_URL_ORDERS} ; do
+    echo -e "\t DB (${DB_ORDERS}) wasn't created - trying again later..."
+    sleep 2
+  done
+  echo "DB (${DB_ORDERS}) was created!"
 fi
+
 echo "Start users service..."
 npm start

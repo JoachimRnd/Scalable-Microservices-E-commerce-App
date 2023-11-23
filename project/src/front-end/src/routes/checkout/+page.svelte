@@ -1,66 +1,78 @@
 <script lang="ts">
-	import { totalPrice, totalQuantity } from '@stores/cart';
-	import { cart } from '@stores/cart';
-	import { onMount } from 'svelte';
+	import { totalPrice, totalQuantity } from "@stores/cart";
+	import { cart } from "@stores/cart";
+	import { onMount } from "svelte";
 
 	import axios from "axios";
+	import { env } from "$env/dynamic/public";
+	const url = env.PUBLIC_AUTH_SERVICE_URL;
 
-	import { addToast } from '@stores/toasts';
+	import { addToast } from "@stores/toasts";
 
 	let prevCheckout: any[];
 
 	onMount(async () => {
-		prevCheckout = JSON.parse(window.localStorage.getItem('checkout')) || [];
+		prevCheckout =
+			JSON.parse(window.localStorage.getItem("checkout")) || [];
 
-		console.log("get commandes")
-		console.log(window.localStorage.getItem('checkout'))
-
+		console.log("get commandes");
+		console.log(window.localStorage.getItem("checkout"));
 	});
 
 	function handleCheckout() {
-		let checkout = {
+		let order = {
 			items: $cart,
 			extras: {
 				totalQuantity: $totalQuantity,
 				totalPrice: $totalPrice,
-				date: new Date().toLocaleDateString('fr')
-			}
+				date: new Date().toLocaleDateString("fr"),
+			},
 		};
-		console.log("make a checkout")
-		console.log("RELOAD")
-		console.log("relaod 2")
-		console.log("checkout")
-		prevCheckout = [...prevCheckout, checkout];
+		console.log("make a checkout");
+		console.log("RELOAD");
+		console.log("relaod 2");
+		console.log("checkout");
+		prevCheckout = [...prevCheckout, order];
 		//todo call back to checkout and remove cart item
 
+		let localUser = window.localStorage.getItem("auth");
+		const token = JSON.parse(localUser).token;
+
+		console.log("token")
+		console.log(token)
 		axios
-		.post(`${url}/checkout`, { checkout })
-		.then((res) => {
-			console.log("axios then");
-		  addToast({
-			message: "Checkout completed",
-			type: "success",
-			dismissible: true,
-			timeout: 3000,
-		  });
-		})
-		.catch((err) => {
-		  addToast({
-			message: "Checkout completed with an error.",
-			type: "error",
-			dismissible: true,
-			timeout: 3000,
-		  });
-		});
-		
+			.post(
+				`${url}/order/checkout`,
+				{ order },
+				{
+					headers: { //TODO
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			)
+			.then((res) => {
+				console.log("axios then");
+				console.log(res);
+				addToast({
+					message: "Order completed",
+					type: "success",
+					dismissible: true,
+					timeout: 3000,
+				});
+			})
+			.catch((err) => {
+				addToast({
+					message: "Order completed with an error.",
+					type: "error",
+					dismissible: true,
+					timeout: 3000,
+				});
+			});
 
+		window.localStorage.setItem("checkout", JSON.stringify(prevCheckout));
 
+		window.sessionStorage.removeItem("cart");
 
-		window.localStorage.setItem('checkout', JSON.stringify(prevCheckout));
-		
-		
-		window.sessionStorage.removeItem('cart');
-		
 		cart.update((old) => []);
 	}
 </script>
@@ -80,28 +92,47 @@
 			<div class="col-md-6 col-lg-5 order-md-last">
 				<h4 class="d-flex justify-content-end align-items-center mb-3">
 					<span class="text-primary text-2xl pr-3">Your cart</span>
-					<span class="badge bg-primary rounded-pill">{$totalQuantity}</span>
+					<span class="badge bg-primary rounded-pill"
+						>{$totalQuantity}</span
+					>
 				</h4>
 				<ul class="list-group mb-3">
 					{#if $cart.length > 0}
 						{#each $cart as item}
-							<li class="list-group-item grid grid-flow-row-dense grid-cols-4 lh-sm">
-								<img class="object-contain h-10 w-10" src={item.image} alt={item.name} />
+							<li
+								class="list-group-item grid grid-flow-row-dense grid-cols-4 lh-sm"
+							>
+								<img
+									class="object-contain h-10 w-10"
+									src={item.image}
+									alt={item.name}
+								/>
 								<div class="m-auto">{item.name}</div>
-								<span class="text-body-secondary text-gray-500 m-auto">{item.quantity}</span>
-								<span class="text-body-secondary text-gray-500 m-auto"
+								<span
+									class="text-body-secondary text-gray-500 m-auto"
+									>{item.quantity}</span
+								>
+								<span
+									class="text-body-secondary text-gray-500 m-auto"
 									>${item.price * item.quantity}</span
 								>
 							</li>
 						{/each}
-						<form method="POST" on:submit|preventDefault={handleCheckout}>
+						<form
+							method="POST"
+							on:submit|preventDefault={handleCheckout}
+						>
 							<button
 								class="w-100 btn btn-primary bg-gradient-to-r from-pink-500 to-yellow-500 hover:from-pink-600 hover:to-yellow-600 border-none my-3"
 								type="submit">Checkout</button
 							>
 						</form>
 					{:else}
-						<li class="list-group-item grid grid-flow-row-dense lh-sm">Your cart is empty</li>
+						<li
+							class="list-group-item grid grid-flow-row-dense lh-sm"
+						>
+							Your cart is empty
+						</li>
 					{/if}
 				</ul>
 			</div>
@@ -111,24 +142,37 @@
 				<ul class="list-group mb-3">
 					{#if prevCheckout}
 						{#each prevCheckout as checkout}
-							<li class="list-group-item grid grid-flow-row-dense grid-cols-2 lh-sm">
+							<li
+								class="list-group-item grid grid-flow-row-dense grid-cols-2 lh-sm"
+							>
 								{#each checkout.items as item}
 									<div class="m-auto flex justify-end w-full">
-										<img class="object-contain h-10 w-10" src={item.image} alt={item.name} />
+										<img
+											class="object-contain h-10 w-10"
+											src={item.image}
+											alt={item.name}
+										/>
 										<span class="my-auto">
 											{item.quantity} x
 											{item.name}</span
 										>
 									</div>
-									<span class="text-body-secondary text-gray-500 m-auto"
+									<span
+										class="text-body-secondary text-gray-500 m-auto"
 										>${item.price * item.quantity}</span
 									>
 								{/each}
-								<div class="m-auto w-full pt-2 col-auto">Total: ${checkout.extras.totalPrice}</div>
+								<div class="m-auto w-full pt-2 col-auto">
+									Total: ${checkout.extras.totalPrice}
+								</div>
 							</li>
 						{/each}
 					{:else}
-						<li class="list-group-item grid grid-flow-row-dense lh-sm">Your cart is empty</li>
+						<li
+							class="list-group-item grid grid-flow-row-dense lh-sm"
+						>
+							Your cart is empty
+						</li>
 					{/if}
 				</ul>
 			</div>

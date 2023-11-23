@@ -14,7 +14,7 @@ ADD gulpfile.js .
 ADD src src
 ADD boot-in-order.sh .
 # string to create tokens (see utils/en-de-coders.js)
-ENV TOKEN_SECRET changeme
+ENV TOKEN_SECRET AkbRocZI
 # header for loggining messages
 ENV DEBUG users-d
 # non empty string use perisitence (with CouchDB)
@@ -23,11 +23,13 @@ ENV WITH_PERSISTENT_DATA Y
 # name of container running CouchDB
 ENV DB_HOST users-db
 # database name
-ENV DB_NAME users
+ENV DB_USERS users
+ENV DB_ORDERS orders
 # authentication information to CRUD (create/remove/update/delete) objects in our DB
 ENV ADMIN_NAME admin
 ENV ADMIN_PASSW admin
-ENV DB_URL http://${ADMIN_NAME}:${ADMIN_PASSW}@${DB_HOST}:5984/${DB_NAME}
+ENV DB_URL_USERS http://${ADMIN_NAME}:${ADMIN_PASSW}@${DB_HOST}:5984/${DB_USERS}
+ENV DB_URL_ORDERS http://${ADMIN_NAME}:${ADMIN_PASSW}@${DB_HOST}:5984/${DB_ORDERS}
 
 # we now use an script to deploy the authentication service
 CMD source boot-in-order.sh
