@@ -2,7 +2,9 @@
 	import { totalPrice, totalQuantity } from '@stores/cart';
 	import { cart } from '@stores/cart';
 	import { onMount } from 'svelte';
+
 	import axios from "axios";
+
 	import { addToast } from '@stores/toasts';
 
 	let prevCheckout: any[];
@@ -25,6 +27,8 @@
 			}
 		};
 		console.log("make a checkout")
+		console.log("RELOAD")
+		console.log("relaod 2")
 		console.log("checkout")
 		prevCheckout = [...prevCheckout, checkout];
 		//todo call back to checkout and remove cart item

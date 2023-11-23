@@ -60,8 +60,5 @@ swarm-init:
 	@docker swarm init --advertise-addr 192.168.56.101
 	@docker network create --driver overlay --attachable scapp-net
 
-reload: frontend-build frontend-push storage-build storage-push auth-build auth-push
+reload: frontend-build frontend-push storage-build storage-push auth-build auth-push swarm-deploy
 	@echo -e "${GREEN}Reloading stack...${NC}"
-	@docker service update --force scapp_users-db
-	@docker service update --force scapp_users-daemon
-	@docker service update --force scapp_frontend
