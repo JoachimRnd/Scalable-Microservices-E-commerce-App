@@ -38,18 +38,21 @@
 		let localUser = window.localStorage.getItem("auth");
 		const token = JSON.parse(localUser).token;
 
-		console.log("token")
-		console.log(token)
+		const config = {
+			headers: { Authorization: `Bearer ${token}` },
+		};
+
+		const bodyParameters = {
+			order: order,
+		};
+
+		console.log("token");
+		console.log(token);
 		axios
 			.post(
 				`${url}/order/checkout`,
-				{ order },
-				{
-					headers: { //TODO
-						Authorization: `Bearer ${token}`,
-					},
-				},
-			)
+				bodyParameters,
+				config)
 			.then((res) => {
 				console.log("axios then");
 				console.log(res);

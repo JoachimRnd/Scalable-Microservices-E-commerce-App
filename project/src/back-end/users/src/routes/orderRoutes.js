@@ -6,9 +6,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 module.exports = (orderCrud) => {
 
-  router.use(authMiddleware);
-
-  router.post('/checkout', (req, res) => {
+  router.post('/checkout',authMiddleware, (req, res) => {
     const order = req.body.order;
     orderCrud.createOrder(order)
       .then((successMessage) => res.status(200).json({ status: 'success', message: successMessage }))

@@ -3,15 +3,18 @@ const log = require('debug')('users-d');
 const tokenUtils = require('../utils/tokenUtils');
 
 function authMiddleware(req, res, next) {
-    console.log("authMiddleware")
-    console.log(req)
-    const token = req.headers.authorization;
-    console.log("headers")
-    console.log(req.headers)
+    const authHeader = req.headers.authorization;
 
-    if (!token) {
+    if (!authHeader) {
         log('Token non fourni');
         return res.status(401).json({ status: 'error', message: 'Non autorisé : Token non fourni' });
+    }
+
+    const [bearer, token] = authHeader.split(' ');
+
+    if (!token || bearer.toLowerCase() !== 'bearer') {
+        log('Token malformaté');
+        return res.status(401).json({ status: 'error', message: 'Non autorisé : Token malformaté' });
     }
 
     try {
@@ -23,7 +26,6 @@ function authMiddleware(req, res, next) {
         }
 
         req.user = decoded;
-        console.log("DECODE CEST BON")
         next();
     } catch (err) {
         log('Échec de la vérification du token');
