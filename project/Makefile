@@ -13,6 +13,7 @@ full-build: frontend-build backend-build
 full-push: frontend-push backend-push   
 backend-build: storage-build  auth-build
 backend-push: storage-push auth-push   
+swarm-reload: swarm-remove swarm-deploy
 
 # Docker tasks
 frontend: frontend-build frontend-push
@@ -59,6 +60,7 @@ gateway-push:
 
 swarm-deploy:
 	@echo "${GREEN}Deploying stack to swarm...${NC}"
+	@
 	@docker stack deploy -c src/scapp.yml scapp
 
 swarm-remove:
@@ -78,5 +80,6 @@ swarm-init:
 	@docker swarm init --advertise-addr 192.168.56.101
 	@docker network create --driver overlay --attachable scapp-net
 
-reload: frontend-build frontend-push storage-build storage-push auth-build auth-push swarm-deploy
+
+reload: frontend storage auth gateway swarm-reload
 	@echo -e "${GREEN}Reloading stack...${NC}"
