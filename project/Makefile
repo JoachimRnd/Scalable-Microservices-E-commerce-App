@@ -40,7 +40,7 @@ auth-push:
 	@docker push ${DOCKER_ID}/scapp-auth
 
 swarm-deploy:
-	@echo -e "${GREEN}Deploying stack to swarm...${NC}"
+	@echo "${GREEN}Deploying stack to swarm...${NC}"
 	@docker stack deploy -c src/scapp.yml scapp
 
 swarm-remove:

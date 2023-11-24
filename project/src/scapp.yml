@@ -1,11 +1,23 @@
 version: "3"
 services:     # list all services for your application
+  # gateway
+  gateway:
+    image: nginx
+    ports: [ "80:80" ]
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf
+    deploy:
+      # locate this service in the swarm manager
+      placement:
+        constraints:
+          - node.role == manager
+    networks: [ "scapp-net" ]
   # frontend
   frontend:
     image: ${DOCKER_ID}/scapp-frontend:latest
     ports: [ "3002:3000" ]
     environment:
-      - PUBLIC_AUTH_SERVICE_URL=http://192.168.56.101:3000
+      - PUBLIC_AUTH_SERVICE_URL=http://192.168.56.101:80
     deploy:
       # deploy 3 instances of this service
       replicas: 1
@@ -40,7 +52,7 @@ services:     # list all services for your application
   # Docker GUI for swarms
   visualizer:
     image: dockersamples/visualizer:latest
-    ports: [ "80:8080" ]
+    ports: [ "8080:8080" ]
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
     deploy:
