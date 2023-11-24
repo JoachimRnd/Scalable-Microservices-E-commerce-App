@@ -18,7 +18,7 @@ server.use((req, res, next) => {
   next();
 });
 
-server.use('/', orderRoutes(orderCrud));
+server.use('/order', orderRoutes(orderCrud));
 
 server.use((req, res, next) => {
   const err = new Error('Not Found');

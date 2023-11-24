@@ -18,7 +18,7 @@ server.use((req, res, next) => {
   next();
 });
 
-server.use('/', userRoutes(userCrud));
+server.use('/user', userRoutes(userCrud));
 
 server.use((req, res, next) => {
   const err = new Error('Not Found');
