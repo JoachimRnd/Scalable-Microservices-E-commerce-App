@@ -1,4 +1,4 @@
-const orders = require('nano')(process.env.DB_URL_ORDERS);
+const orders = require('nano')(process.env.DB_URL);
 
 function createOrder(order) {
   return new Promise((resolve, reject) => {

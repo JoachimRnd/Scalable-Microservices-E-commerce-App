@@ -2,8 +2,8 @@ const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 const log = require('debug')('users-d');
-const userRoutes = require('./routes/userRoutes');
-const userCrud = require('./utils/crud/crud-user');
+const orderRoutes = require('./routes/orderRoutes');
+const orderCrud = require('./utils/crud/crud-order');
 
 const server = express();
 
@@ -18,7 +18,7 @@ server.use((req, res, next) => {
   next();
 });
 
-server.use('/', userRoutes(userCrud));
+server.use('/', orderRoutes(orderCrud));
 
 server.use((req, res, next) => {
   const err = new Error('Not Found');

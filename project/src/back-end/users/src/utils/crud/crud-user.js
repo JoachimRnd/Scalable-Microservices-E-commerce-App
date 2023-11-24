@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const tokenUtils = require('../tokenUtils');
-const users = require('nano')(process.env.DB_URL_USERS);
+const users = require('nano')(process.env.DB_URL);
 
 function equalPassws(usrPass, usrDbPass) {
   return bcrypt.compareSync(usrPass, usrDbPass);
