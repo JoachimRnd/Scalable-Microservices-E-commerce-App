@@ -12,7 +12,13 @@ full: full-build full-push
 full-build: frontend-build backend-build
 full-push: frontend-push backend-push   
 backend-build: storage-build  auth-build
-backend-push: storage-push auth-push                                                                                                                                                                  
+backend-push: storage-push auth-push   
+
+# Docker tasks
+frontend: frontend-build frontend-push
+storage: storage-build storage-push
+auth: auth-build auth-push
+gateway: gateway-build gateway-push
                                                                                                                                                                                                                
 # Small tasks   
 frontend-build:
@@ -38,6 +44,18 @@ auth-build:
 auth-push:
 	@docker tag scapp-auth ${DOCKER_ID}/scapp-auth
 	@docker push ${DOCKER_ID}/scapp-auth
+
+gateway-build:
+	@echo -e "${GREEN}Buidling gateway docker image...${NC}"
+	@docker build -t scapp-gateway src/back-end/gateway
+
+gateway-push:
+	@docker tag scapp-gateway ${DOCKER_ID}/scapp-gateway
+	@docker push ${DOCKER_ID}/scapp-gateway
+
+###############
+# SWARM TASKS #
+###############
 
 swarm-deploy:
 	@echo "${GREEN}Deploying stack to swarm...${NC}"
