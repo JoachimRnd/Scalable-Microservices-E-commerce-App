@@ -12,11 +12,25 @@
 	let prevCheckout: any[];
 
 	onMount(async () => {
-		prevCheckout =
-			JSON.parse(window.localStorage.getItem("checkout")) || [];
+		let localUser = window.localStorage.getItem("auth");
+		const token = JSON.parse(localUser).token;
 
-		console.log("get commandes");
-		console.log(window.localStorage.getItem("checkout"));
+		axios
+			.get(`${url}/order/user/orders`, {
+				headers: { Authorization: `Bearer ${token}` },
+			})
+			.then((response) => {
+				prevCheckout = response.data.data || [];
+			})
+			.catch((error) => {
+				console.error("Error fetching user orders:", error);
+				addToast({
+					message: "Error fetching user orders.",
+					type: "error",
+					dismissible: true,
+					timeout: 3000,
+				});
+			});
 	});
 
 	function handleCheckout() {
@@ -28,10 +42,7 @@
 				date: new Date().toLocaleDateString("fr"),
 			},
 		};
-		console.log("make a checkout");
-		console.log("RELOAD");
-		console.log("relaod 2");
-		console.log("checkout");
+
 		prevCheckout = [...prevCheckout, order];
 		//todo call back to checkout and remove cart item
 
@@ -46,16 +57,9 @@
 			order: order,
 		};
 
-		console.log("token");
-		console.log(token);
 		axios
-			.post(
-				`${url}/order/checkout`,
-				bodyParameters,
-				config)
+			.post(`${url}/order/checkout`, bodyParameters, config)
 			.then((res) => {
-				console.log("axios then");
-				console.log(res);
 				addToast({
 					message: "Order completed",
 					type: "success",
@@ -71,8 +75,6 @@
 					timeout: 3000,
 				});
 			});
-
-		window.localStorage.setItem("checkout", JSON.stringify(prevCheckout));
 
 		window.sessionStorage.removeItem("cart");
 

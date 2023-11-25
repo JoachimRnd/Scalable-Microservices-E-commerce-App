@@ -1,6 +1,6 @@
 const orders = require('nano')(process.env.DB_URL);
 
-function createOrder(order) {
+const createOrder = (order) => {
   return new Promise((resolve, reject) => {
     orders.insert(
       order,
@@ -15,6 +15,20 @@ function createOrder(order) {
   });
 }
 
+const getOrdersByUserId = (userId) => {
+  return new Promise((resolve, reject) => {
+    orders.view('orders', 'byUserId', { key: userId, include_docs: true }, (err, body) => {
+      if (!err) {
+        const orders = body.rows.map(row => row.doc);
+        resolve(orders);
+      } else {
+        reject(new Error(`Error getting orders by user ID. Reason: ${err.reason}.`));
+      }
+    });
+  });
+}
+
 module.exports = {
   createOrder,
+  getOrdersByUserId
 };
