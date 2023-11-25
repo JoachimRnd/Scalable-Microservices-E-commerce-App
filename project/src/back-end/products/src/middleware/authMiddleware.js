@@ -24,8 +24,7 @@ function authMiddleware(req, res, next) {
             log('Token expiré');
             return res.status(401).json({ status: 'error', message: 'Non autorisé : Token expiré' });
         }
-
-        req.user = decoded;
+        req.userId = decoded.sub;
         next();
     } catch (err) {
         log('Échec de la vérification du token');

@@ -3,7 +3,6 @@ const router = express.Router();
 const log = require('debug')('users-d');
 
 module.exports = (userCrud) => {
-  console.log("REGISTER FONCTIONNE")
   router.post('/', (req, res) => {
     const usrName = req.body.username;
     const usrPassw = req.body.password;
