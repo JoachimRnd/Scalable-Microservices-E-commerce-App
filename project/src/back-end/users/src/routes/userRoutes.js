@@ -15,7 +15,7 @@ module.exports = (userCrud) => {
     const usrName = req.params.username;
     const passw = req.params.password;
     userCrud.getUser(usrName, passw)
-      .then((token) => res.status(200).json({ status: 'success', token }))
+      .then(([token, role]) => res.status(200).json({ status: 'success', data: { token, role } }))
       .catch((err) => res.status(404).json({ status: 'error', message: String(err) }));
   });
   return router;

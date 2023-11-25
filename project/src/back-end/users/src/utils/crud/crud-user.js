@@ -9,7 +9,7 @@ function equalPassws(usrPass, usrDbPass) {
 function createUser(usrName, passw) {
   return new Promise((resolve, reject) => {
     users.insert(
-      { 'passw': bcrypt.hashSync(passw, bcrypt.genSaltSync()) },
+      { 'passw': bcrypt.hashSync(passw, bcrypt.genSaltSync()), 'role': 'user' },
       usrName,
       (error, success) => {
         if (success) {
@@ -29,7 +29,7 @@ function getUser(usrName, passw) {
         if (!equalPassws(passw, success.passw)) {
           reject(new Error(`Passwords (for user: ${usrName}) do not match.`));
         }
-        resolve(tokenUtils.encodeToken(usrName));
+        resolve([tokenUtils.encodeToken(usrName), success.role]);
       } else {
         reject(new Error(`To fetch information of user (${usrName}). Reason: ${error.reason}.`));
       }

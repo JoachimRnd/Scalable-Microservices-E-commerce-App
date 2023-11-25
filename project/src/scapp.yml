@@ -1,6 +1,9 @@
 version: "3"
 services:     # list all services for your application
-  # gateway
+
+  ###########
+  # gateway #
+  ###########
   gateway:
     image: ${DOCKER_ID}/scapp-gateway:latest
     ports: [ "80:80" ]
@@ -10,7 +13,11 @@ services:     # list all services for your application
         constraints:
           - node.role == manager
     networks: [ "scapp-net" ]
-  # frontend
+    depends_on: ["users-daemon", "products-daemon" ]
+  
+  ############
+  # frontend #
+  ############
   frontend:
     image: ${DOCKER_ID}/scapp-frontend:latest
     ports: [ "3002:3000" ]
@@ -21,6 +28,23 @@ services:     # list all services for your application
       replicas: 1
       restart_policy:
         # restart if something went wrong
+        condition: on-failure
+    networks: [ "scapp-net" ]
+  
+
+  #########
+  # users #
+  #########
+  # server that listens HTTP requests
+  users-daemon:
+    image: ${DOCKER_ID}/scapp-auth:latest
+    # link both services (same effect of option --link in docker run)
+    depends_on: [ "users-db" ]
+    # expose port number 3000 of host running this service
+    ports: [ "3000:80" ]
+    deploy:
+      replicas: 1
+      restart_policy:
         condition: on-failure
     networks: [ "scapp-net" ]
   # database of users
@@ -35,6 +59,23 @@ services:     # list all services for your application
         # restart if something went wrong
         condition: on-failure
     networks: [ "scapp-net" ]
+
+
+  ############
+  # Products #
+  ############
+  # server that listens order HTTP requests
+  products-daemon:
+    image: ${DOCKER_ID}/scapp-products:latest
+    # link both services (same effect of option --link in docker run)
+    depends_on: [ "products-db" ]
+    # expose port number 3004 of host running this service
+    ports: [ "3004:80" ]
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks: [ "scapp-net" ]
   # database of products
   products-db:
     # image name
@@ -47,30 +88,11 @@ services:     # list all services for your application
         # restart if something went wrong
         condition: on-failure
     networks: [ "scapp-net" ]
-  # server that listens HTTP requests
-  users-daemon:
-    image: ${DOCKER_ID}/scapp-auth:latest
-    # link both services (same effect of option --link in docker run)
-    depends_on: [ "users-db" ]
-    # expose port number 3000 of host running this service
-    ports: [ "3000:80" ]
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-    networks: [ "scapp-net" ]
-    # server that listens HTTP requests
-  products-daemon:
-    image: ${DOCKER_ID}/scapp-products:latest
-    # link both services (same effect of option --link in docker run)
-    depends_on: [ "products-db" ]
-    # expose port number 3004 of host running this service
-    ports: [ "3004:80" ]
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-    networks: [ "scapp-net" ]
+
+
+  ##############
+  # visualizer #
+  ##############
   # Docker GUI for swarms
   visualizer:
     image: dockersamples/visualizer:latest

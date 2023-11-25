@@ -17,9 +17,10 @@
 		axios
 		.get(`${url}/user/${username}/${password}`)
 		.then((res) => {
+			console.log(res.data);
 			$user.isLogged = true;
-			$user.isAdmin = false;
-			window.localStorage.setItem("auth", JSON.stringify({ ...$user, token: res.data.token }));
+			$user.isAdmin = res.data.data.role === "admin";
+			window.localStorage.setItem("auth", JSON.stringify({ ...$user, token: res.data.data.token }));
 			addToast({
 				message: `Welcome back ${username}!`,
 				type: "success",
