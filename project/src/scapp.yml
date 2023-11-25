@@ -15,7 +15,7 @@ services:     # list all services for your application
     networks: [ "scapp-net" ]
     depends_on: 
       - users-daemon
-      - products-daemon
+      - orders-daemon
   
   ############
   # frontend #
@@ -64,13 +64,13 @@ services:     # list all services for your application
 
 
   ############
-  # Products #
+  # Orders #
   ############
   # server that listens order HTTP requests
-  products-daemon:
-    image: ${DOCKER_ID}/scapp-products:latest
+  orders-daemon:
+    image: ${DOCKER_ID}/scapp-orders:latest
     # link both services (same effect of option --link in docker run)
-    depends_on: [ "products-db" ]
+    depends_on: [ "orders-db" ]
     # expose port number 3004 of host running this service
     ports: [ "3004:80" ]
     deploy:
@@ -78,10 +78,10 @@ services:     # list all services for your application
       restart_policy:
         condition: on-failure
     networks: [ "scapp-net" ]
-  # database of products
-  products-db:
+  # database of orders
+  orders-db:
     # image name
-    image: ${DOCKER_ID}/products-storage-system:latest
+    image: ${DOCKER_ID}/orders-storage-system:latest
     ports: ["3003:5984"]
     deploy:
       # deploy only one instance of this service

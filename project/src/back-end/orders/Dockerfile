@@ -16,14 +16,14 @@ ADD boot-in-order.sh .
 # string to create tokens (see utils/en-de-coders.js)
 ENV TOKEN_SECRET AkbRocZI
 # header for loggining messages
-ENV DEBUG products-d
+ENV DEBUG orders-d
 # non empty string use perisitence (with CouchDB)
 ENV WITH_PERSISTENT_DATA Y
 
 # name of container running CouchDB
-ENV DB_HOST products-db
+ENV DB_HOST orders-db
 # database name
-ENV DB_NAME products
+ENV DB_NAME orders
 # authentication information to CRUD (create/remove/update/delete) objects in our DB
 ENV ADMIN_NAME admin
 ENV ADMIN_PASSW admin

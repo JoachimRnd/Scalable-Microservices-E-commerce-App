@@ -11,16 +11,17 @@ NC=\033[0m
 full: full-build full-push                                                                                                                                                                                               
 full-build: frontend-build backend-build
 full-push: frontend-push backend-push   
-backend-build: users-storage-build products-storage-build products-build auth-build
-backend-push: users-storage-push products-storage-push products-push auth-push   
-swarm-reload: swarm-remove swarm-deploy
+backend-build: users-storage-build orders-storage-build orders-build auth-build
+backend-push: users-storage-push orders-storage-push orders-push auth-push   
+swarm-reload: swarm-deploy
+# swarm-remove
 
 # Docker tasks
 frontend: frontend-build frontend-push
-storage: users-storage-build users-storage-push products-storage-build products-storage-push
+storage: users-storage-build users-storage-push orders-storage-build orders-storage-push
 auth: auth-build auth-push
 gateway: gateway-build gateway-push
-products: products-build products-push
+orders: orders-build orders-push
                                                                                                                                                                                                                
 # Small tasks   
 frontend-build:
@@ -39,13 +40,13 @@ users-storage-push:
 	@docker tag users-storage-system ${DOCKER_ID}/users-storage-system
 	@docker push ${DOCKER_ID}/users-storage-system
 
-products-storage-build:
-	@echo -e "${GREEN}Buidling products storage docker image...${NC}"
-	@docker build -t products-storage-system src/back-end/storage
+orders-storage-build:
+	@echo -e "${GREEN}Buidling orders storage docker image...${NC}"
+	@docker build -t orders-storage-system src/back-end/storage
 
-products-storage-push:
-	@docker tag products-storage-system ${DOCKER_ID}/products-storage-system
-	@docker push ${DOCKER_ID}/products-storage-system
+orders-storage-push:
+	@docker tag orders-storage-system ${DOCKER_ID}/orders-storage-system
+	@docker push ${DOCKER_ID}/orders-storage-system
 
 auth-build:
 	@echo -e "${GREEN}Buidling auth docker image...${NC}"
@@ -55,13 +56,13 @@ auth-push:
 	@docker tag scapp-auth ${DOCKER_ID}/scapp-auth
 	@docker push ${DOCKER_ID}/scapp-auth
 
-products-build:
-	@echo -e "${GREEN}Buidling products docker image...${NC}"
-	@docker build -t scapp-products src/back-end/products
+orders-build:
+	@echo -e "${GREEN}Buidling orders docker image...${NC}"
+	@docker build -t scapp-orders src/back-end/orders
 
-products-push:
-	@docker tag scapp-products ${DOCKER_ID}/scapp-products
-	@docker push ${DOCKER_ID}/scapp-products	
+orders-push:
+	@docker tag scapp-orders ${DOCKER_ID}/scapp-orders
+	@docker push ${DOCKER_ID}/scapp-orders	
 
 gateway-build:
 	@echo -e "${GREEN}Buidling gateway docker image...${NC}"
@@ -96,5 +97,5 @@ swarm-init:
 	@docker swarm init --advertise-addr 192.168.56.101
 	@docker network create --driver overlay --attachable scapp-net
 
-reload: frontend storage auth products gateway swarm-reload
+reload: frontend storage auth orders gateway swarm-reload
 	@echo -e "${GREEN}Reloading stack...${NC}"
