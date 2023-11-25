@@ -13,7 +13,9 @@ services:     # list all services for your application
         constraints:
           - node.role == manager
     networks: [ "scapp-net" ]
-    depends_on: ["users-daemon", "products-daemon" ]
+    depends_on: 
+      - users-daemon
+      - products-daemon
   
   ############
   # frontend #
