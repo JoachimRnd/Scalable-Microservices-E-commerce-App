@@ -13,8 +13,7 @@ full-build: frontend-build backend-build
 full-push: frontend-push backend-push   
 backend-build: users-storage-build orders-storage-build orders-build auth-build
 backend-push: users-storage-push orders-storage-push orders-push auth-push   
-swarm-reload: swarm-deploy
-# swarm-remove
+swarm-reload: swarm-remove swarm-deploy
 
 # Docker tasks
 frontend: frontend-build frontend-push

@@ -26,6 +26,18 @@ if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
     echo -e "\t DB (${DB_NAME}) wasn't created - trying again later..."
     sleep 2
   done
+  echo "Inserting views into the database..."
+
+  curl --request PUT \
+     --url ${DB_URL}/_design/orders \
+     --header 'Content-Type: application/json' \
+     --data '{
+       "views": {
+         "byUserId": {
+           "map": "function (doc) { if (doc.userId) { emit(doc.userId, doc); }}"
+         }
+       }
+     }'
   echo "DB (${DB_NAME}) was created!"
 fi
 echo "Start users service..."
