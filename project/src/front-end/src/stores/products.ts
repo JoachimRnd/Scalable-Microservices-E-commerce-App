@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { derived, writable } from 'svelte/store';
 
 export const products = createProducts();
@@ -14,7 +15,7 @@ function createProducts() {
 				if (!(product.category in oldProducts)) {
 					oldProducts[product.category] = [];
 				}
-				oldProducts[product.category].push({ ...product, id: crypto.randomUUID() });
+				oldProducts[product.category].push({ ...product, id: uuidv4() });
 				return oldProducts;
 			})
 	};
