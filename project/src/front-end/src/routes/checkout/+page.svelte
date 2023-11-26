@@ -44,8 +44,6 @@
 		};
 
 		prevCheckout = [...prevCheckout, order];
-		//todo call back to checkout and remove cart item
-
 		let localUser = window.localStorage.getItem("auth");
 		const token = JSON.parse(localUser).token;
 
@@ -57,6 +55,7 @@
 			order: order,
 		};
 
+		//Adding order in orders-db
 		axios
 			.post(`${url}/order/checkout`, bodyParameters, config)
 			.then((res) => {
@@ -76,7 +75,12 @@
 				});
 			});
 
-		window.sessionStorage.removeItem("cart");
+		//Removing cart in shopping-carts-db
+		axios
+			.delete(`${url}/cart`, config)
+			.catch((err) => {
+				console.error("Error removing cart:", err);
+			});
 
 		cart.update((old) => []);
 	}

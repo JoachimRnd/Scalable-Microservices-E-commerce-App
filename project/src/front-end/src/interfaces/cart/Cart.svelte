@@ -6,6 +6,12 @@
 
 	let showModal = false;
 
+  	import { onMount } from 'svelte';
+
+	onMount(async () => {
+    	await cart.getCart();
+    });
+
 	function goToCheckout() {
 		goto('/checkout');
 	}

@@ -3,7 +3,7 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const log = require('debug')('users-d');
 const orderRoutes = require('./routes/cartRoutes');
-const orderCrud = require('./utils/crud/crud-cart');
+const cartCrud = require('./utils/crud/crud-cart');
 
 const server = express();
 
@@ -11,14 +11,14 @@ server.use(logger('dev'));
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: false }));
 
-server.use((req, res, next) => {
+/*server.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
-});
+});*/
 
-server.use('/cart', orderRoutes(orderCrud));
+server.use('/cart', orderRoutes(cartCrud));
 
 server.use((req, res, next) => {
   const err = new Error('Not Found');

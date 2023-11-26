@@ -11,12 +11,12 @@ server.use(logger('dev'));
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: false }));
 
-server.use((req, res, next) => {
+/*server.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
-});
+});*/
 
 server.use('/user', userRoutes(userCrud));
 

@@ -21,7 +21,6 @@
     quantity = 0;
 
     success("Added item to cart");
-    window.localStorage.setItem("cart", JSON.stringify($cart));
   }
 </script>
 

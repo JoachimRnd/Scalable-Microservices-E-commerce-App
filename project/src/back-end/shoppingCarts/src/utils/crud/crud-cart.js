@@ -1,34 +1,49 @@
-const orders = require('nano')(process.env.DB_URL);
+const shoppingCarts = require('nano')(process.env.DB_URL);
 
-const createOrder = (order) => {
+const saveCart = (cart) => {
   return new Promise((resolve, reject) => {
-    orders.insert(
-      order,
+    shoppingCarts.insert(
+      cart,
       (error, success) => {
         if (success) {
-          resolve("Order successfully created");
+          resolve("Cart successfully saved");
         } else {
-          reject(new Error(`Error creating an order. Reason: ${error.reason}.`));
+          reject(new Error(`Error saving the cart. Reason: ${error.reason}.`));
         }
       }
     );
   });
 }
 
-const getOrdersByUserId = (userId) => {
+const getCartById = (id) => {
   return new Promise((resolve, reject) => {
-    orders.view('orders', 'byUserId', { key: userId, include_docs: true }, (err, body) => {
+    shoppingCarts.view('carts', 'byId', { key: id, include_docs: true }, (err, body) => {
       if (!err) {
-        const orders = body.rows.map(row => row.doc);
-        resolve(orders);
+        const carts = body.rows.map(row => row.doc);
+        resolve(carts);
       } else {
-        reject(new Error(`Error getting orders by user ID. Reason: ${err.reason}.`));
+        reject(new Error(`Error getting carts by ID. Reason: ${err.reason}.`));
       }
     });
   });
-}
+};
+
+const deleteCart = (id, revision) => {
+  return new Promise((resolve, reject) => {
+    shoppingCarts.destroy(id, revision, (err, success) => {
+      if (success) {
+        resolve("Cart successfully deleted");
+      } else {
+        reject(new Error(`Error deleting the cart. Reason: ${err.reason}.`));
+      }
+    });
+  });
+};
+
+
 
 module.exports = {
-  createOrder,
-  getOrdersByUserId
+  saveCart,
+  getCartById,
+  deleteCart
 };
