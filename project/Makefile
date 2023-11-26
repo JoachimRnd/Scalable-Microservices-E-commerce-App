@@ -5,26 +5,34 @@ RED=\033[0;31m
 GREEN=\033[0;32m                                                                                                                                                                                               
 BLUE=\033[0;34m                                                                                                                                                                                                
 YELLOW=\033[0;33m                                                                                                                                                                                              
-NC=\033[0m                                                                                                                                                                                                     
-                                                                                                                                                                                                               
-# Main tasks    
+NC=\033[0m   
+
+# Docker ID
+DOCKER_ID=mxdx02
+
+##############                                                                                                                                                                                                             
+# Main tasks #
+##############  
 full: full-build full-push                                                                                                                                                                                               
 full-build: frontend-build backend-build
 full-push: frontend-push backend-push   
-backend-build: users-storage-build orders-storage-build shopping-carts-storage-build orders-build auth-build shopping-carts-build gateway-build
-backend-push: users-storage-push orders-storage-push shopping-carts-storage-push orders-push auth-push shopping-carts-push gateway-push  
+backend-build: storage-build orders-build auth-build shopping-carts-build products-build gateway-build
+backend-push: storage-push orders-push auth-push shopping-carts-push products-push gateway-push  
 swarm-reload: swarm-remove swarm-deploy
 
 # Docker tasks
 frontend: frontend-build frontend-push
 backend: backend-build backend-push
-storage: users-storage-build users-storage-push orders-storage-build orders-storage-push shopping-carts-storage-build shopping-carts-storage-push
+storage: storage-build storage-push 
 auth: auth-build auth-push
 gateway: gateway-build gateway-push
 orders: orders-build orders-push
+products: products-build products-push
 shopping-carts: shopping-carts-build shopping-carts-push
-                                                                                                                                                                                                               
-# Small tasks   
+
+###############                                                                                                                                                                                                               
+# Small tasks #
+############### 
 frontend-build:
 	@echo -e "${GREEN}Buidling frontend docker image...${NC}"
 	@docker build -t scapp-frontend src/front-end
@@ -33,29 +41,13 @@ frontend-push:
 	@docker tag scapp-frontend ${DOCKER_ID}/scapp-frontend
 	@docker push ${DOCKER_ID}/scapp-frontend
 
-users-storage-build:
-	@echo -e "${GREEN}Buidling users storage docker image...${NC}"
-	@docker build -t users-storage-system src/back-end/storage
+storage-build:
+	@echo -e "${GREEN}Buidling storage docker image...${NC}"
+	@docker build -t storage-system src/back-end/storage
 
-users-storage-push:
-	@docker tag users-storage-system ${DOCKER_ID}/users-storage-system
-	@docker push ${DOCKER_ID}/users-storage-system
-
-orders-storage-build:
-	@echo -e "${GREEN}Buidling orders storage docker image...${NC}"
-	@docker build -t orders-storage-system src/back-end/storage
-
-orders-storage-push:
-	@docker tag orders-storage-system ${DOCKER_ID}/orders-storage-system
-	@docker push ${DOCKER_ID}/orders-storage-system
-
-shopping-carts-storage-build:
-	@echo -e "${GREEN}Buidling shopping-carts storage docker image...${NC}"
-	@docker build -t shopping-carts-storage-system src/back-end/storage
-
-shopping-carts-storage-push:
-	@docker tag shopping-carts-storage-system ${DOCKER_ID}/shopping-carts-storage-system
-	@docker push ${DOCKER_ID}/shopping-carts-storage-system
+storage-push:
+	@docker tag storage-system ${DOCKER_ID}/storage-system
+	@docker push ${DOCKER_ID}/storage-system
 
 auth-build:
 	@echo -e "${GREEN}Buidling auth docker image...${NC}"
@@ -81,6 +73,14 @@ shopping-carts-push:
 	@docker tag scapp-shopping-carts ${DOCKER_ID}/scapp-shopping-carts
 	@docker push ${DOCKER_ID}/scapp-shopping-carts	
 
+products-build:
+	@echo -e "${GREEN}Buidling products docker image...${NC}"
+	@docker build -t scapp-products src/back-end/products
+
+products-push:
+	@docker tag scapp-products ${DOCKER_ID}/scapp-products
+	@docker push ${DOCKER_ID}/scapp-products
+
 gateway-build:
 	@echo -e "${GREEN}Buidling gateway docker image...${NC}"
 	@docker build -t scapp-gateway src/back-end/gateway
@@ -95,7 +95,7 @@ gateway-push:
 
 swarm-deploy:
 	@echo "${GREEN}Deploying stack to swarm...${NC}"
-	@docker stack deploy -c src/scapp.yml scapp
+	@docker stack deploy --resolve-image always -c src/scapp.yml scapp
 
 swarm-remove:
 	@echo -e "${GREEN}Removing stack from swarm...${NC}"
@@ -116,3 +116,15 @@ swarm-init:
 
 reload: full swarm-reload
 	@echo -e "${GREEN}Reloading stack...${NC}"
+
+
+# Force pull from docker hub
+pull:
+	@echo -e "${GREEN}Pulling images from docker hub...${NC}"
+	@docker pull ${DOCKER_ID}/scapp-frontend:latest
+	@docker pull ${DOCKER_ID}/storage-system
+	@docker pull ${DOCKER_ID}/scapp-auth
+	@docker pull ${DOCKER_ID}/scapp-orders
+	@docker pull ${DOCKER_ID}/scapp-shopping-carts
+	@docker pull ${DOCKER_ID}/scapp-products
+	@docker pull ${DOCKER_ID}/scapp-gateway
