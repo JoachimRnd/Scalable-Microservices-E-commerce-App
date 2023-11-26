@@ -1,25 +1,80 @@
 import { v4 as uuidv4 } from 'uuid';
 import { derived, writable } from 'svelte/store';
 
+import axios from 'axios';
+import { env } from "$env/dynamic/public";
+
+
+const PRODUCT_URL = `${env.PUBLIC_AUTH_SERVICE_URL}/products`;
+
 export const products = createProducts();
+export const productsStatic = test();
+// export const products = dynamicCatalog();
 
 function createProducts() {
-	const { subscribe, set, update } = writable(staticCatalog());
+	console.log(dynamicCatalog());
+	const { subscribe, set, update } = writable(dynamicCatalog());
 
 	return {
 		subscribe,
 		update,
 		set,
-		__addProduct: (product) =>
-			update((oldProducts) => {
-				if (!(product.category in oldProducts)) {
-					oldProducts[product.category] = [];
-				}
-				oldProducts[product.category].push({ ...product, id: uuidv4() });
-				return oldProducts;
-			})
+		__addProduct,
 	};
 }
+
+function test() {
+	const products = staticCatalog();
+	console.log(products);
+	const { subscribe, set, update } = writable(products);
+
+	return {
+		subscribe,
+		update,
+		set,
+	};
+}
+
+async function __addProduct(product) {
+	axios
+		.post(PRODUCT_URL, product)
+		.then((response) => {
+			console.log(response);
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+}
+
+async function dynamicCatalog() {
+	axios
+		.get(PRODUCT_URL)
+		.then((response) => {
+			const data = response.data.data;
+			console.log(categorizeProducts(data));	
+			return categorizeProducts(data);
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+}
+
+function categorizeProducts(products: any[]): any {
+	const categorizedProducts: any = {};
+
+	for (const product of products) {
+		const { _id, _rev, ...rest } = product;
+
+		if (!categorizedProducts[rest.category]) {
+			categorizedProducts[rest.category] = [];
+		}
+
+		categorizedProducts[rest.category].push(rest);
+	}
+
+	return categorizedProducts;
+}
+
 function staticCatalog() {
 	return {
 		Vegetables: [
