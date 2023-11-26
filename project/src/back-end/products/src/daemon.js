@@ -7,18 +7,21 @@ const productsRoutes = require('./routes/productsRoutes');
 const productsCrud = require('./utils/crud/crud-products');
 
 const server = express();
-server.use(cors());
-
-
-server.use(logger('dev'));
-server.use(bodyParser.json());
-server.use(bodyParser.urlencoded({ extended: false }));
+server.use(cors({
+  origin: '*',
+  methods: ['GET', 'PUT', 'POST', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 server.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
 });
+
+server.use(logger('dev'));
+server.use(bodyParser.json());
+server.use(bodyParser.urlencoded({ extended: false }));
 
 server.use('/products', productsRoutes(productsCrud));
 

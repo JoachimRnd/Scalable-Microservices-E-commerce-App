@@ -7,17 +7,31 @@ import { env } from "$env/dynamic/public";
 
 const PRODUCT_URL = `${env.PUBLIC_AUTH_SERVICE_URL}/products`;
 
-// export const products = createProducts();
-export const products = dynamicCatalog();
+export const products = createProducts();
+export const productsStatic = test();
+// export const products = dynamicCatalog();
 
 function createProducts() {
-	const { subscribe, set, update } = writable(staticCatalog());
+	console.log(dynamicCatalog());
+	const { subscribe, set, update } = writable(dynamicCatalog());
 
 	return {
 		subscribe,
 		update,
 		set,
 		__addProduct,
+	};
+}
+
+function test() {
+	const products = staticCatalog();
+	console.log(products);
+	const { subscribe, set, update } = writable(products);
+
+	return {
+		subscribe,
+		update,
+		set,
 	};
 }
 
