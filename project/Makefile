@@ -11,16 +11,18 @@ NC=\033[0m
 full: full-build full-push                                                                                                                                                                                               
 full-build: frontend-build backend-build
 full-push: frontend-push backend-push   
-backend-build: users-storage-build orders-storage-build orders-build auth-build
-backend-push: users-storage-push orders-storage-push orders-push auth-push   
+backend-build: users-storage-build orders-storage-build shopping-carts-storage-build orders-build auth-build shopping-carts-build gateway-build
+backend-push: users-storage-push orders-storage-push shopping-carts-storage-push orders-push auth-push shopping-carts-push gateway-push  
 swarm-reload: swarm-remove swarm-deploy
 
 # Docker tasks
 frontend: frontend-build frontend-push
-storage: users-storage-build users-storage-push orders-storage-build orders-storage-push
+backend: backend-build backend-push
+storage: users-storage-build users-storage-push orders-storage-build orders-storage-push shopping-carts-storage-build shopping-carts-storage-push
 auth: auth-build auth-push
 gateway: gateway-build gateway-push
 orders: orders-build orders-push
+shopping-carts: shopping-carts-build shopping-carts-push
                                                                                                                                                                                                                
 # Small tasks   
 frontend-build:
@@ -47,6 +49,14 @@ orders-storage-push:
 	@docker tag orders-storage-system ${DOCKER_ID}/orders-storage-system
 	@docker push ${DOCKER_ID}/orders-storage-system
 
+shopping-carts-storage-build:
+	@echo -e "${GREEN}Buidling shopping-carts storage docker image...${NC}"
+	@docker build -t shopping-carts-storage-system src/back-end/storage
+
+shopping-carts-storage-push:
+	@docker tag shopping-carts-storage-system ${DOCKER_ID}/shopping-carts-storage-system
+	@docker push ${DOCKER_ID}/shopping-carts-storage-system
+
 auth-build:
 	@echo -e "${GREEN}Buidling auth docker image...${NC}"
 	@docker build -t scapp-auth src/back-end/users
@@ -62,6 +72,14 @@ orders-build:
 orders-push:
 	@docker tag scapp-orders ${DOCKER_ID}/scapp-orders
 	@docker push ${DOCKER_ID}/scapp-orders	
+
+shopping-carts-build:
+	@echo -e "${GREEN}Buidling shopping-carts docker image...${NC}"
+	@docker build -t scapp-shopping-carts src/back-end/shoppingCarts
+
+shopping-carts-push:
+	@docker tag scapp-shopping-carts ${DOCKER_ID}/scapp-shopping-carts
+	@docker push ${DOCKER_ID}/scapp-shopping-carts	
 
 gateway-build:
 	@echo -e "${GREEN}Buidling gateway docker image...${NC}"
@@ -96,5 +114,5 @@ swarm-init:
 	@docker swarm init --advertise-addr 192.168.56.101
 	@docker network create --driver overlay --attachable scapp-net
 
-reload: frontend storage auth orders gateway swarm-reload
+reload: full swarm-reload
 	@echo -e "${GREEN}Reloading stack...${NC}"

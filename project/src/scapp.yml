@@ -16,6 +16,7 @@ services:     # list all services for your application
     depends_on: 
       - users-daemon
       - orders-daemon
+      - shopping-carts-daemon
   
   ############
   # frontend #
@@ -91,6 +92,34 @@ services:     # list all services for your application
         condition: on-failure
     networks: [ "scapp-net" ]
 
+
+  ############
+  # Shopping-carts #
+  ############
+  # server that listens order HTTP requests
+  shopping-carts-daemon:
+    image: ${DOCKER_ID}/scapp-shopping-carts:latest
+    # link both services (same effect of option --link in docker run)
+    depends_on: [ "shopping-carts-db" ]
+    # expose port number 3004 of host running this service
+    ports: [ "3005:80" ]
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks: [ "scapp-net" ]
+  # database of shopping-carts
+  shopping-carts-db:
+    # image name
+    image: ${DOCKER_ID}/shopping-carts-storage-system:latest
+    ports: ["3006:5984"]
+    deploy:
+      # deploy only one instance of this service
+      replicas: 1
+      restart_policy:
+        # restart if something went wrong
+        condition: on-failure
+    networks: [ "scapp-net" ]
 
   ##############
   # visualizer #
