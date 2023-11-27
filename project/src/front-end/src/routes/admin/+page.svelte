@@ -55,9 +55,7 @@
 
 	function deleteProduct(product) {
 		// This function deletes the product from the local store only.
-		let index = $products[product.category].findIndex((prod) => prod.id == product.id);
-		if (index == -1) return;
-		$products[product.category].splice(index, 1);
+		products.__deleteProduct(product);
 		$products = $products; // This line is needed because Svelte's reactivity is triggered by assignment. Deleting an element of the array is not an assignment so we trigger one manually.
 		modalProduct = null;
 		showUpdateModal = false;

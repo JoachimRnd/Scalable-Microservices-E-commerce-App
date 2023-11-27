@@ -64,6 +64,9 @@ function createProducts() {
 	const __addProduct = async (product: Product) => {
 		try {
 			const localUser = window.localStorage.getItem('auth');
+			if (!localUser) {
+				throw new Error('No user found');
+			}
 			const token = JSON.parse(localUser).token;
 			const config = {
 				headers: { Authorization: `Bearer ${token}` },
@@ -110,6 +113,9 @@ function createProducts() {
 	const __updateProducts = async (product: Product) => {
 		try {
 			const localUser = window.localStorage.getItem('auth');
+			if (!localUser) {
+				throw new Error('No user found');
+			}
 			const token = JSON.parse(localUser).token;
 			const config = {
 				headers: { Authorization: `Bearer ${token}` },
@@ -141,14 +147,68 @@ function createProducts() {
 		}
 	}
 
+	const deleteProductLocal = (products: any, deletedProduct: any) => {
+		const { category } = deletedProduct;
+
+		// Find the product in the local list
+		const index = products[category].findIndex(
+			(product: any) => product._id === deletedProduct._id
+		);
+
+		// Delete the product in the local list
+		products[category].splice(index, 1);
+
+		return products;
+	}
+
+	const __deleteProduct = async (product: Product) =>  {
+
+		try {
+			const localUser = window.localStorage.getItem('auth');
+			if (!localUser) {
+				throw new Error('No user found');
+			}
+			const token = JSON.parse(localUser).token;
+			const config = {
+				headers: { Authorization: `Bearer ${token}` },
+			};
+
+			console.log('headers', config.headers)
+
+			const bodyParameters = {
+				product: {
+					_id : product._id,
+					_rev: product._rev,
+					name: product.name,
+					price: product.price,
+					image: product.image,
+					category: product.category,
+				}
+			};
+
+			console.log('bodyParameters', bodyParameters);
+
+			const response = await axios.delete(PRODUCT_URL, { data: bodyParameters, ...config });			
+			const finalProduct = response.data.message.product;
+			
+			console.log('finalProduct', finalProduct);
+
+			update((oldProducts) => {
+				return deleteProductLocal(oldProducts, finalProduct);
+			});
+		} catch (error) {
+			handleError(error, 'Delete Product');
+		}
+	}
+
 	
 	getProducts(); 
-
 	return {
 		subscribe,
 		__updateProducts,
 		set,
 		__addProduct,
+		__deleteProduct,
 		getProducts,
 	};
 }

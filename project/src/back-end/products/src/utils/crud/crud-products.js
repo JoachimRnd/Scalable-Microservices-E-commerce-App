@@ -37,6 +37,25 @@ const updateProduct = (product) => {
   });
 }
 
+const deleteProduct = (product) => {
+  return new Promise((resolve, reject) => {
+    products.destroy(
+      product._id,
+      product._rev,
+      (error, success) => {
+        if (success) {
+          console.log("Product successfully deleted");
+          console.log(success);
+
+          resolve({product : product});
+        } else {
+          reject(new Error(`Error deleting an product. Reason: ${error.reason}.`));
+        }
+      }
+    );
+  });
+}
+
 const getProductsByCategory = (category) => {
   return new Promise((resolve, reject) => {
     products.view('products', 'byCategory', { key: category, include_docs: true }, (err, body) => {
@@ -70,4 +89,5 @@ module.exports = {
   getProductsByCategory,
   getProducts,
   updateProduct,
+  deleteProduct,
 };
