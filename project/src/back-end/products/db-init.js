@@ -9,8 +9,6 @@ console.log('Inserting item into the database...');
 
 items.forEach(async (item) => {
   try {
-    //item._id = item.id;
-    //delete item.id;
     await axios.post(DB_URL, item); // Replace DB_URL with your database URL
     console.log(item);
   } catch (error) {

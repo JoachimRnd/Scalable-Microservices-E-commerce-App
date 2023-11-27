@@ -1,6 +1,5 @@
 [
     {
-        "id": 1,
         "name": "Brocolli",
         "price": 2.73,
         "image":
@@ -8,7 +7,6 @@
         "category": "Vegetables"
     },
     {
-        "id": 2,
         "name": "Cauliflower",
         "price": 6.3,
         "image":
@@ -16,7 +14,6 @@
         "category": "Vegetables"
     },
     {
-        "id": 3,
         "name": "Cucumber",
         "price": 5.6,
         "image":
@@ -24,7 +21,6 @@
         "category": "Vegetables"
     },
     {
-        "id": 4,
         "name": "Beetroot",
         "price": 8.7,
         "image":
@@ -33,7 +29,6 @@
     }
     ,
     {
-        "id": 5,
         "name": "Apple",
         "price": 2.34,
         "image":
@@ -41,7 +36,6 @@
         "category": "Fruits"
     },
     {
-        "id": 6,
         "name": "Banana",
         "price": 1.69,
         "image":
@@ -49,7 +43,6 @@
         "category": "Fruits"
     },
     {
-        "id": 7,
         "name": "Grapes",
         "price": 5.98,
         "image":
@@ -57,7 +50,6 @@
         "category": "Fruits"
     },
     {
-        "id": 8,
         "name": "Mango",
         "price": 6.8,
         "image":

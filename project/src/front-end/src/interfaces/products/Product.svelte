@@ -7,7 +7,7 @@
   let showModal = false;
 
   interface Product {
-    id: number;
+    _id: string;
     name: string;
     price: number;
     image: string;

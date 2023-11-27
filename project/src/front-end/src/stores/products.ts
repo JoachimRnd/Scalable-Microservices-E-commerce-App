@@ -37,7 +37,7 @@ function createProducts() {
 		const categorizedProducts: any = {};
 
 		for (const product of products) {
-			const { _id, _rev, ...rest } = product;
+			const { _rev, ...rest } = product;
 
 			if (!categorizedProducts[rest.category]) {
 				categorizedProducts[rest.category] = [];

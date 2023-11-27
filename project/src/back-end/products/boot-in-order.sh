@@ -43,7 +43,6 @@ if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
 
   echo "DB (${DB_NAME}) was created!"
 
-  # Exécuter db-init.js après la création réussie de la base de données
   echo "Running db-init.js..."
   node db-init.js
 fi
