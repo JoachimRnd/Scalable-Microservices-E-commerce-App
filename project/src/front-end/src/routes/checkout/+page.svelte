@@ -137,7 +137,7 @@
 					>
 				</h4>
 				<ul class="list-group mb-3">
-					{#if $cart.length > 0}
+					{#if $cart && $cart.length > 0}
 						{#each $cart as item}
 							<li
 								class="list-group-item grid grid-flow-row-dense grid-cols-4 lh-sm"
@@ -180,7 +180,7 @@
 			<div class="col-md-6 col-lg-7">
 				<h1 class="text-2xl mb-3 text-center">Purchase history</h1>
 				<ul class="list-group mb-3">
-					{#if prevCheckout.length > 0}
+					{#if prevCheckout && prevCheckout.length > 0}
 						{#each prevCheckout as checkout}
 							<li
 								class="list-group-item grid grid-flow-row-dense grid-cols-2 lh-sm"

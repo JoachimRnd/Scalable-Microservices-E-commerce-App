@@ -19,13 +19,10 @@ function createProducts() {
 	};
 
 	const getProducts = async () => {
-		console.log("appel à get products")
 		try {
 			const response = await axios.get(PRODUCT_URL);
 			const data = response.data.data;
-			console.log("getProducts", data)
 			const categorizedProducts = categorizeProducts(data);
-			console.log("categorized products", categorizedProducts)
 			set(categorizedProducts);
 			return categorizedProducts;
 		} catch (error) {
@@ -59,7 +56,6 @@ function createProducts() {
 			//TODO à voir pour la structure du product la c'est peut être pas bon -> voir cart.ts
 
 			const response = await axios.post(PRODUCT_URL, product, config);
-			console.log(response);
 
 			update((oldProducts) => {
 				return [...oldProducts, response.data];
