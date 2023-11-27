@@ -30,7 +30,7 @@ if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
 
   echo "Inserting views into the database..."
 
-  curl --request PUT \
+  curl -v --request PUT \
   --url ${DB_URL}/_design/products \
   --header 'Content-Type: application/json' \
   --data '{
