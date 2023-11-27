@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { totalPrice, totalQuantity } from "@stores/cart";
-	import { cart } from "@stores/cart";
+	import { totalPrice, totalQuantity, cart } from "@stores/cart";
 	import { onMount } from "svelte";
 
 	import axios from "axios";
@@ -12,6 +11,8 @@
 	let prevCheckout: any[];
 
 	onMount(async () => {
+		await cart.getCart();
+
 		let localUser = window.localStorage.getItem("auth");
 		const token = JSON.parse(localUser).token;
 

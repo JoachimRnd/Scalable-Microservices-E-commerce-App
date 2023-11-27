@@ -17,6 +17,7 @@ services:     # list all services for your application
       - users-daemon
       - orders-daemon
       - shopping-carts-daemon
+      - products-daemon
   
   ############
   # frontend #
@@ -53,7 +54,7 @@ services:     # list all services for your application
   # database of users
   users-db:
     # image name
-    image: ${DOCKER_ID}/users-storage-system:latest
+    image: ${DOCKER_ID}/storage-system:latest
     ports: ["3001:5984"]
     deploy:
       # deploy only one instance of this service
@@ -64,9 +65,9 @@ services:     # list all services for your application
     networks: [ "scapp-net" ]
 
 
-  ############
+  ##########
   # Orders #
-  ############
+  ##########
   # server that listens order HTTP requests
   orders-daemon:
     image: ${DOCKER_ID}/scapp-orders:latest
@@ -82,7 +83,7 @@ services:     # list all services for your application
   # database of orders
   orders-db:
     # image name
-    image: ${DOCKER_ID}/orders-storage-system:latest
+    image: ${DOCKER_ID}/storage-system:latest
     ports: ["3003:5984"]
     deploy:
       # deploy only one instance of this service
@@ -93,9 +94,9 @@ services:     # list all services for your application
     networks: [ "scapp-net" ]
 
 
-  ############
+  ##################
   # Shopping-carts #
-  ############
+  ##################
   # server that listens order HTTP requests
   shopping-carts-daemon:
     image: ${DOCKER_ID}/scapp-shopping-carts:latest
@@ -111,8 +112,37 @@ services:     # list all services for your application
   # database of shopping-carts
   shopping-carts-db:
     # image name
-    image: ${DOCKER_ID}/shopping-carts-storage-system:latest
+    image: ${DOCKER_ID}/storage-system:latest
     ports: ["3006:5984"]
+    deploy:
+      # deploy only one instance of this service
+      replicas: 1
+      restart_policy:
+        # restart if something went wrong
+        condition: on-failure
+    networks: [ "scapp-net" ]
+
+  ############
+  # Products #
+  ############
+  # server that listens order HTTP requests
+  products-daemon:
+    image: ${DOCKER_ID}/scapp-products:latest
+    # link both services (same effect of option --link in docker run)
+    depends_on: [ "products-db" ]
+    # expose port number 3004 of host running this service
+    ports: [ "3007:80" ]
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks: [ "scapp-net" ]
+
+  # database of products
+  products-db:
+    # image name
+    image: ${DOCKER_ID}/storage-system:latest
+    ports: ["3008:5984"]
     deploy:
       # deploy only one instance of this service
       replicas: 1

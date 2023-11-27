@@ -18,7 +18,10 @@
 </script>
 
 <form class="d-flex">
-	<button class="btn btn-outline-dark" on:click={() => (showModal = true)}>
+	<button class="btn btn-outline-dark" on:click={async () => {
+		await cart.getCart();
+		showModal = true;
+	}}>
 		<i class="bi-cart-fill me-1" />
 		Cart
 		<span class="badge bg-dark text-white ms-1 rounded-pill">{$totalQuantity}</span>

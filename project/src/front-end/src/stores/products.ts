@@ -1,25 +1,87 @@
-import { v4 as uuidv4 } from 'uuid';
 import { derived, writable } from 'svelte/store';
+import axios from 'axios';
+import { env } from '$env/dynamic/public';
+import { addToast } from '@stores/toasts';
 
-export const products = createProducts();
+const PRODUCT_URL = `${env.PUBLIC_AUTH_SERVICE_URL}/products`;
 
 function createProducts() {
-	const { subscribe, set, update } = writable(staticCatalog());
+	const { subscribe, set, update } = writable([]);
+
+	const handleError = (error: any, message: string) => {
+		console.error(`${message}:`, error);
+		addToast({
+			message: `Failed to ${message.toLowerCase()}`,
+			type: 'error',
+			dismissible: true,
+			timeout: 3000,
+		});
+	};
+
+	const getProducts = async () => {
+		console.log("appel à get products")
+		try {
+			const response = await axios.get(PRODUCT_URL);
+			const data = response.data.data;
+			console.log("getProducts", data)
+			const categorizedProducts = categorizeProducts(data);
+			console.log("categorized products", categorizedProducts)
+			set(categorizedProducts);
+			return categorizedProducts;
+		} catch (error) {
+			handleError(error, 'get products');
+		}
+	};
+
+	const categorizeProducts = (products: any[]): any => {
+		const categorizedProducts: any = {};
+
+		for (const product of products) {
+			const { _rev, ...rest } = product;
+
+			if (!categorizedProducts[rest.category]) {
+				categorizedProducts[rest.category] = [];
+			}
+
+			categorizedProducts[rest.category].push(rest);
+		}
+
+		return categorizedProducts;
+	};
+
+	const addProduct = async (product) => {
+		try {
+			const localUser = window.localStorage.getItem('auth');
+			const token = JSON.parse(localUser).token;
+			const config = {
+				headers: { Authorization: `Bearer ${token}` },
+			};
+			//TODO à voir pour la structure du product la c'est peut être pas bon -> voir cart.ts
+
+			const response = await axios.post(PRODUCT_URL, product, config);
+			console.log(response);
+
+			update((oldProducts) => {
+				return [...oldProducts, response.data];
+			});
+		} catch (error) {
+			handleError(error, 'Add Product');
+		}
+	};
+
+	
+	getProducts(); 
 
 	return {
 		subscribe,
 		update,
 		set,
-		__addProduct: (product) =>
-			update((oldProducts) => {
-				if (!(product.category in oldProducts)) {
-					oldProducts[product.category] = [];
-				}
-				oldProducts[product.category].push({ ...product, id: uuidv4() });
-				return oldProducts;
-			})
+		addProduct,
+		getProducts,
 	};
 }
+
+
 function staticCatalog() {
 	return {
 		Vegetables: [
@@ -92,6 +154,11 @@ function staticCatalog() {
 		]
 	};
 }
+
+
+
+export const products = createProducts();
+export const productsStatic = staticCatalog();
 
 export const productsMerged = derived(products, ($products) => {
 	return Object.values($products).flat();

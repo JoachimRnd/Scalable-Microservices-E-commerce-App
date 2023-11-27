@@ -2,8 +2,8 @@ const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 const log = require('debug')('users-d');
-const cartRoutes = require('./routes/cartRoutes');
-const cartCrud = require('./utils/crud/crud-cart');
+const productsRoutes = require('./routes/productsRoutes');
+const productsCrud = require('./utils/crud/crud-products');
 
 const server = express();
 
@@ -18,7 +18,7 @@ server.use(bodyParser.urlencoded({ extended: false }));
   next();
 });*/
 
-server.use('/cart', cartRoutes(cartCrud));
+server.use('/products', productsRoutes(productsCrud));
 
 server.use((req, res, next) => {
   const err = new Error('Not Found');

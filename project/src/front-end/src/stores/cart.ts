@@ -47,6 +47,8 @@ function createCart() {
 			if (response.data.cart && response.data.cart.length > 0) {
 				const cartFromServer = response.data.cart;
 				set(cartFromServer);
+			}else{
+				cart.update((old) => []);
 			}
 		} catch (error) {
 			handleError(error, 'Get Cart');
