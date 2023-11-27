@@ -11,12 +11,6 @@ module.exports = (productsCrud) => {
     productsCrud.createProduct(product)
     .then((successMessage) => res.status(200).json({ status: 'success', message: successMessage }))
     .catch((err) => res.status(409).json({ status: 'error', message: String(err) }));
-    // } else {
-    //   console.log('Updating product');
-    //   productsCrud.updateProduct(product)
-    //   .then((successMessage) => res.status(200).json({ status: 'success', message: successMessage }))
-    //   .catch((err) => res.status(409).json({ status: 'error', message: String(err) }));
-    // }
   });
 
   router.put('/', authMiddleware, (req, res) => {
@@ -24,6 +18,15 @@ module.exports = (productsCrud) => {
     const product = req.body.product;
 
     productsCrud.updateProduct(product)
+      .then((successMessage) => res.status(200).json({ status: 'success', message: successMessage }))
+      .catch((err) => res.status(409).json({ status: 'error', message: String(err) }));
+  });
+
+  router.delete('/', authMiddleware, (req, res) => {
+    console.log('Deleting product');
+    const product = req.body.product;
+
+    productsCrud.deleteProduct(product)
       .then((successMessage) => res.status(200).json({ status: 'success', message: successMessage }))
       .catch((err) => res.status(409).json({ status: 'error', message: String(err) }));
   });

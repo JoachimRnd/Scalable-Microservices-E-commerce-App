@@ -13,7 +13,7 @@ function createUser(usrName, passw) {
       usrName,
       (error, success) => {
         if (success) {
-          resolve(tokenUtils.encodeToken(usrName));
+          resolve(tokenUtils.encodeToken(usrName, 'user'));
         } else {
           reject(new Error(`In the creation of user (${usrName}). Reason: ${error.reason}.`));
         }
@@ -29,7 +29,7 @@ function getUser(usrName, passw) {
         if (!equalPassws(passw, success.passw)) {
           reject(new Error(`Passwords (for user: ${usrName}) do not match.`));
         }
-        resolve([tokenUtils.encodeToken(usrName), success.role]);
+        resolve([tokenUtils.encodeToken(usrName, success.role), success.role]);
       } else {
         reject(new Error(`To fetch information of user (${usrName}). Reason: ${error.reason}.`));
       }
