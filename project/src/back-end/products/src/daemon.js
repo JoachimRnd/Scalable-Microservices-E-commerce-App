@@ -18,7 +18,7 @@ server.use(bodyParser.urlencoded({ extended: false }));
   next();
 });*/
 
-server.use('/products', orderRoutes(cartCrud));
+server.use('/products', productsRoutes(productsCrud));
 
 server.use((req, res, next) => {
   const err = new Error('Not Found');

@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "node db-init.js && gulp --gulpfile gulpfile.js"
+    "start": "gulp --gulpfile gulpfile.js"
   },
   "dependencies": {
     "debug": "2.6.6",

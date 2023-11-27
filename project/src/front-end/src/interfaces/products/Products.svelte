@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Product from './Product.svelte';
 	import { products } from '@stores/products';
+
 	console.log(products);
-	console.log(Object.keys(products));
 
 </script>
 

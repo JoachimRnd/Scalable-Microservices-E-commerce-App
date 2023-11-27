@@ -1,79 +1,86 @@
-import { v4 as uuidv4 } from 'uuid';
 import { derived, writable } from 'svelte/store';
-
 import axios from 'axios';
-import { env } from "$env/dynamic/public";
-
+import { env } from '$env/dynamic/public';
+import { addToast } from '@stores/toasts';
 
 const PRODUCT_URL = `${env.PUBLIC_AUTH_SERVICE_URL}/products`;
 
-export const products = createProducts();
-export const productsStatic = test();
-// export const products = dynamicCatalog();
-
 function createProducts() {
-	console.log(dynamicCatalog());
-	const { subscribe, set, update } = writable(dynamicCatalog());
+	const { subscribe, set, update } = writable([]);
 
-	return {
-		subscribe,
-		update,
-		set,
-		__addProduct,
-	};
-}
-
-function test() {
-	const products = staticCatalog();
-	console.log(products);
-	const { subscribe, set, update } = writable(products);
-
-	return {
-		subscribe,
-		update,
-		set,
-	};
-}
-
-async function __addProduct(product) {
-	axios
-		.post(PRODUCT_URL, product)
-		.then((response) => {
-			console.log(response);
-		})
-		.catch((error) => {
-			console.log(error);
+	const handleError = (error: any, message: string) => {
+		console.error(`${message}:`, error);
+		addToast({
+			message: `Failed to ${message.toLowerCase()}`,
+			type: 'error',
+			dismissible: true,
+			timeout: 3000,
 		});
-}
+	};
 
-async function dynamicCatalog() {
-	axios
-		.get(PRODUCT_URL)
-		.then((response) => {
+	const getProducts = async () => {
+		console.log("appel à get products")
+		try {
+			const response = await axios.get(PRODUCT_URL);
 			const data = response.data.data;
-			console.log(categorizeProducts(data));	
-			return categorizeProducts(data);
-		})
-		.catch((error) => {
-			console.log(error);
-		});
-}
+			console.log("getProducts", data)
+			const categorizedProducts = categorizeProducts(data);
+			console.log("categorized products", categorizedProducts)
+			set(categorizedProducts);
+			return categorizedProducts;
+		} catch (error) {
+			handleError(error, 'get products');
+		}
+	};
 
-function categorizeProducts(products: any[]): any {
-	const categorizedProducts: any = {};
+	const categorizeProducts = (products: any[]): any => {
+		const categorizedProducts: any = {};
 
-	for (const product of products) {
-		const { _id, _rev, ...rest } = product;
+		for (const product of products) {
+			const { _id, _rev, ...rest } = product;
 
-		if (!categorizedProducts[rest.category]) {
-			categorizedProducts[rest.category] = [];
+			if (!categorizedProducts[rest.category]) {
+				categorizedProducts[rest.category] = [];
+			}
+
+			categorizedProducts[rest.category].push(rest);
 		}
 
-		categorizedProducts[rest.category].push(rest);
-	}
+		return categorizedProducts;
+	};
 
-	return categorizedProducts;
+	const addProduct = async (product) => {
+		try {
+			const localUser = window.localStorage.getItem('auth');
+			const token = JSON.parse(localUser).token;
+			const config = {
+				headers: { Authorization: `Bearer ${token}` },
+			};
+			//TODO à voir pour la structure du product la c'est peut être pas bon -> voir cart.ts
+
+			const response = await axios.post(PRODUCT_URL, product, config);
+			console.log(response);
+
+			update((oldProducts) => {
+				return [...oldProducts, response.data];
+			});
+		} catch (error) {
+			handleError(error, 'Add Product');
+		}
+	};
+
+	
+	getProducts(); 
+
+	return {
+		subscribe,
+		update,
+		set,
+		addProduct,
+		getProducts,
+	};
 }
+
 
 function staticCatalog() {
 	return {
@@ -147,6 +154,11 @@ function staticCatalog() {
 		]
 	};
 }
+
+
+
+export const products = createProducts();
+export const productsStatic = staticCatalog();
 
 export const productsMerged = derived(products, ($products) => {
 	return Object.values($products).flat();

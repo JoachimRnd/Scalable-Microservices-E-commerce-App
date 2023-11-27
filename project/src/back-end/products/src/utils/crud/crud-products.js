@@ -15,22 +15,23 @@ const createProduct = (product) => {
   });
 }
 
-const getProducts = () => {
+const getProductsByCategory = (category) => {
   return new Promise((resolve, reject) => {
-    orders.view('products', 'byCategory', { key: userId, include_docs: true }, (err, body) => {
+    products.view('products', 'byCategory', { key: category, include_docs: true }, (err, body) => {
       if (!err) {
-        const orders = body.rows.map(row => row.doc);
-        resolve(orders);
+        const products = body.rows.map(row => row.doc);
+        resolve(products);
       } else {
-        reject(new Error(`Error getting orders by category. Reason: ${err.reason}.`));
+        reject(new Error(`Error getting products by category. Reason: ${err.reason}.`));
       }
     });
   });
 }
 
-const getAllProducts = () => {
+
+const getProducts = () => {
   return new Promise((resolve, reject) => {
-    products.list({ include_docs: true }, (err, body) => {
+    products.view('products', 'getProducts', { include_docs: true }, (err, body) => {
       if (err) {
         reject(new Error(`Error getting all products. Reason: ${err.reason}.`));
       } else {
@@ -41,8 +42,9 @@ const getAllProducts = () => {
   });
 }
 
+
 module.exports = {
   createProduct,
+  getProductsByCategory,
   getProducts,
-  getAllProducts,
 };
