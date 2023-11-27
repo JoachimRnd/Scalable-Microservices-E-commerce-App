@@ -60,7 +60,7 @@ function createCart() {
 		update,
 		addToCart: (item: any) =>
 			update((oldCart) => {
-				const itemIndex = oldCart.findIndex((e) => e.id === item.id);
+				const itemIndex = oldCart.findIndex((e) => e._id === item._id);
 				const newCart =
 					itemIndex === -1
 						? [...oldCart, item]

@@ -19,5 +19,12 @@ module.exports = (productsCrud) => {
       .catch((err) => res.status(500).json({ status: 'error', message: String(err) }));
   });
 
+  router.post('/ids', (req, res) => {
+    const productIds = req.body.productIds;
+    productsCrud.getProductsByIds(productIds)
+      .then((products) => res.status(200).json({ status: 'success', data: products }))
+      .catch((err) => res.status(500).json({ status: 'error', message: String(err) }));
+  });
+
   return router;
 };

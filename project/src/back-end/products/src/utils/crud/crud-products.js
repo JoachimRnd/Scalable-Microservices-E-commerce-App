@@ -42,9 +42,25 @@ const getProducts = () => {
   });
 }
 
+const getProductsByIds = (productIds) => {
+  return new Promise((resolve, reject) => {
+    products.view('products', 'getProductsByIds', { keys: productIds, include_docs: true }, (err, body) => {
+      if (err) {
+        reject(new Error(`Error getting products by IDs. Reason: ${err.reason}.`));
+      } else {
+        const productsByIds = body.rows.map(row => row.doc);
+        resolve(productsByIds);
+      }
+    });
+  });
+}
+
+
+
 
 module.exports = {
   createProduct,
   getProductsByCategory,
   getProducts,
+  getProductsByIds,
 };
