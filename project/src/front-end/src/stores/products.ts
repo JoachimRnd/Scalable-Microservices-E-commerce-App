@@ -2,6 +2,7 @@ import { derived, writable } from 'svelte/store';
 import axios from 'axios';
 import { env } from '$env/dynamic/public';
 import { addToast } from '@stores/toasts';
+import Product from '@interfaces/products/Product.svelte';
 
 const PRODUCT_URL = `${env.PUBLIC_AUTH_SERVICE_URL}/products`;
 
@@ -37,46 +38,117 @@ function createProducts() {
 		const categorizedProducts: any = {};
 
 		for (const product of products) {
-			const { _rev, ...rest } = product;
-
-			if (!categorizedProducts[rest.category]) {
-				categorizedProducts[rest.category] = [];
+			if (!categorizedProducts[product.category]) {
+				categorizedProducts[product.category] = [];
 			}
 
-			categorizedProducts[rest.category].push(rest);
+			categorizedProducts[product.category].push(product);
 		}
 
 		return categorizedProducts;
 	};
 
-	const addProduct = async (product) => {
+	const addProductsLocal = (products: any, newProduct: any) => {
+		// Add the product in the local list
+		const { category } = newProduct;
+
+		if (!products[category]) {
+			products[category] = [];
+		}
+
+		products[category].push(newProduct);
+
+		return products;
+	};
+
+	const __addProduct = async (product: Product) => {
 		try {
 			const localUser = window.localStorage.getItem('auth');
 			const token = JSON.parse(localUser).token;
 			const config = {
 				headers: { Authorization: `Bearer ${token}` },
 			};
-			//TODO à voir pour la structure du product la c'est peut être pas bon -> voir cart.ts
 
-			const response = await axios.post(PRODUCT_URL, product, config);
-			console.log(response);
+			console.log('product', product);
+
+			const bodyParameters = {
+				product: {
+					name: product.name,
+					price: product.price,
+					image: product.image,
+					category: product.category,
+				}
+			};
+			console.log('bodyParameters', bodyParameters);
+
+			const response = await axios.post(PRODUCT_URL, bodyParameters, config);
+			const finalProduct = response.data.message.product;
 
 			update((oldProducts) => {
-				return [...oldProducts, response.data];
+				console.log("Old products", oldProducts);
+				return addProductsLocal(oldProducts, finalProduct);
 			});
 		} catch (error) {
 			handleError(error, 'Add Product');
 		}
 	};
 
+	const updateProductLocal = (products: any, updatedProduct: any) => {
+		const { category } = updatedProduct;
+
+		// Find the product in the local list
+		const index = products[category].findIndex(
+			(product: any) => product._id === updatedProduct._id
+		);
+
+		// Update the product in the local list
+		products[category][index] = updatedProduct;
+
+		return products;
+	}
+
+	const __updateProducts = async (product: Product) => {
+		try {
+			const localUser = window.localStorage.getItem('auth');
+			const token = JSON.parse(localUser).token;
+			const config = {
+				headers: { Authorization: `Bearer ${token}` },
+			};
+
+			const bodyParameters = {
+				product: {
+					_id : product._id,
+					_rev: product._rev,
+					name: product.name,
+					price: product.price,
+					image: product.image,
+					category: product.category,
+				}
+			};
+
+			console.log('bodyParameters', bodyParameters);
+
+			const response = await axios.put(PRODUCT_URL, bodyParameters, config);
+			const finalProduct = response.data.message.product;
+
+			console.log('finalProduct', finalProduct);
+
+			update((oldProducts) => {
+				return updateProductLocal(oldProducts, finalProduct);
+			});
+		} catch (error) {
+			handleError(error, 'Update Product');
+		}
+	}
+
 	
 	getProducts(); 
 
 	return {
 		subscribe,
-		update,
+		__updateProducts,
 		set,
-		addProduct,
+		__addProduct,
 		getProducts,
 	};
 }

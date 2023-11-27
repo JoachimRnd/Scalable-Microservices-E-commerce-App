@@ -36,14 +36,14 @@
 	}
 
 	function updateModalProduct() {
-		// Sanitize input
-		let index = $products[modalProduct.category].findIndex((prod) => prod.id == modalProduct.id);
-		$products[modalProduct.category][index] = modalProduct;
+		products.__updateProducts(modalProduct);
 		modalProduct = null;
 		showUpdateModal = false;
 	}
 
 	function createProduct() {
+		console.log("Modal Product:");
+		console.log(modalProduct);
 		products.__addProduct(modalProduct);
 		modalProduct = null;
 		showCreateModal = false;

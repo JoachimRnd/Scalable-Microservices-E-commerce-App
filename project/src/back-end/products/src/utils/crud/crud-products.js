@@ -6,9 +6,31 @@ const createProduct = (product) => {
       product,
       (error, success) => {
         if (success) {
-          resolve("Order successfully created");
+          console.log("Product successfully created");
+          console.log(success);
+
+          const productWIthId = { ...product, _id: success.id, _rev: success.rev };
+          resolve({product : productWIthId});
         } else {
           reject(new Error(`Error creating an product. Reason: ${error.reason}.`));
+        }
+      }
+    );
+  });
+}
+
+const updateProduct = (product) => {
+  return new Promise((resolve, reject) => {
+    products.insert(
+      product,
+      (error, success) => {
+        if (success) {
+          console.log("Product successfully updated");
+          console.log(success);
+
+          resolve({product : product});
+        } else {
+          reject(new Error(`Error updating an product. Reason: ${error.reason}.`));
         }
       }
     );
@@ -47,4 +69,5 @@ module.exports = {
   createProduct,
   getProductsByCategory,
   getProducts,
+  updateProduct,
 };

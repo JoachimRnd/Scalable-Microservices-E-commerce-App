@@ -21,6 +21,7 @@ server.use(bodyParser.urlencoded({ extended: false }));
 server.use('/products', productsRoutes(productsCrud));
 
 server.use((req, res, next) => {
+  console.log('Requested URL', req.url);
   const err = new Error('Not Found');
   err.status = 404;
   next(err);

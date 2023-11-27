@@ -5,9 +5,27 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 module.exports = (productsCrud) => {
   router.post('/', authMiddleware, (req, res) => {
-    console.log('create product')
+    console.log("Product")
+    console.log(req.body.product)
     const product = req.body.product;
+
+    console.log('Creating new product');
     productsCrud.createProduct(product)
+    .then((successMessage) => res.status(200).json({ status: 'success', message: successMessage }))
+    .catch((err) => res.status(409).json({ status: 'error', message: String(err) }));
+    // } else {
+    //   console.log('Updating product');
+    //   productsCrud.updateProduct(product)
+    //   .then((successMessage) => res.status(200).json({ status: 'success', message: successMessage }))
+    //   .catch((err) => res.status(409).json({ status: 'error', message: String(err) }));
+    // }
+  });
+
+  router.put('/', authMiddleware, (req, res) => {
+    console.log('Updating product');
+    const product = req.body.product;
+
+    productsCrud.updateProduct(product)
       .then((successMessage) => res.status(200).json({ status: 'success', message: successMessage }))
       .catch((err) => res.status(409).json({ status: 'error', message: String(err) }));
   });
