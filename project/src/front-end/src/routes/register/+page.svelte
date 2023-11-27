@@ -11,11 +11,9 @@
 	let username = "";
 	let password = "";
 	function handleOnSubmit() {
-		console.log("HANDLE SUBMIT register");
 	  axios
 		.post(`${url}/user`, { username, password })
 		.then((res) => {
-			console.log("axios then");
 		  $user.isLogged = true;
 		  $user.isAdmin = false;
 		  window.localStorage.setItem("auth", JSON.stringify({ ...$user, token: res.data.token }));

@@ -14,7 +14,6 @@
 		// Initialize stored auth session
 		let localUser = window.localStorage.getItem('auth');
 		if (localUser) {
-			console.log(JSON.parse(localUser));
 			$user = JSON.parse(localUser);
 		}
 

@@ -11,31 +11,61 @@
 	let prevCheckout: any[];
 
 	onMount(async () => {
-		await cart.getCart();
+		try {
+			await cart.getCart();
 
-		let localUser = window.localStorage.getItem("auth");
-		const token = JSON.parse(localUser).token;
+			let localUser = window.localStorage.getItem("auth");
+			const token = JSON.parse(localUser).token;
 
-		axios
-			.get(`${url}/order/user/orders`, {
+			const response = await axios.get(`${url}/order/user/orders`, {
 				headers: { Authorization: `Bearer ${token}` },
-			})
-			.then((response) => {
-				prevCheckout = response.data.data || [];
-			})
-			.catch((error) => {
-				console.error("Error fetching user orders:", error);
-				addToast({
-					message: "Error fetching user orders.",
-					type: "error",
-					dismissible: true,
-					timeout: 3000,
-				});
 			});
+
+			const orders = response.data.data || [];
+			const productIds = orders.flatMap((order) =>
+				order.items.map((item) => item._id),
+			);
+
+			if (productIds.length > 0) {
+				const productsDetailsResponse = await axios.post(
+					`${url}/products/ids`,
+					{ productIds },
+					{
+						headers: { Authorization: `Bearer ${token}` },
+					},
+				);
+
+				const productsDetails = productsDetailsResponse.data.data;
+				prevCheckout = orders.map((order) => ({
+					...order,
+					items: order.items.map((item) => ({
+						...item,
+						...productsDetails.find(
+							(detail) => detail._id === item._id,
+						),
+					})),
+				}));
+			} else {
+				prevCheckout = [];
+			}
+		} catch (error) {
+			console.error("Error fetching user orders:", error);
+			addToast({
+				message: "Error fetching user orders.",
+				type: "error",
+				dismissible: true,
+				timeout: 3000,
+			});
+		}
 	});
 
 	function handleCheckout() {
-		let order = {
+		let productsDetails = $cart.map((item) => ({
+			_id: item._id,
+			quantity: item.quantity,
+		}));
+
+		const order = {
 			items: $cart,
 			extras: {
 				totalQuantity: $totalQuantity,
@@ -43,6 +73,8 @@
 				date: new Date().toLocaleDateString("fr"),
 			},
 		};
+
+		const orderForServer = { ...order, items: productsDetails };
 
 		prevCheckout = [...prevCheckout, order];
 		let localUser = window.localStorage.getItem("auth");
@@ -53,7 +85,7 @@
 		};
 
 		const bodyParameters = {
-			order: order,
+			order: orderForServer,
 		};
 
 		//Adding order in orders-db
@@ -77,11 +109,9 @@
 			});
 
 		//Removing cart in shopping-carts-db
-		axios
-			.delete(`${url}/cart`, config)
-			.catch((err) => {
-				console.error("Error removing cart:", err);
-			});
+		axios.delete(`${url}/cart`, config).catch((err) => {
+			console.error("Error removing cart:", err);
+		});
 
 		cart.update((old) => []);
 	}
@@ -107,7 +137,7 @@
 					>
 				</h4>
 				<ul class="list-group mb-3">
-					{#if $cart.length > 0}
+					{#if $cart && $cart.length > 0}
 						{#each $cart as item}
 							<li
 								class="list-group-item grid grid-flow-row-dense grid-cols-4 lh-sm"
@@ -150,7 +180,7 @@
 			<div class="col-md-6 col-lg-7">
 				<h1 class="text-2xl mb-3 text-center">Purchase history</h1>
 				<ul class="list-group mb-3">
-					{#if prevCheckout}
+					{#if prevCheckout && prevCheckout.length > 0}
 						{#each prevCheckout as checkout}
 							<li
 								class="list-group-item grid grid-flow-row-dense grid-cols-2 lh-sm"

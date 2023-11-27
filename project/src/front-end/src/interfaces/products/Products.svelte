@@ -2,8 +2,6 @@
 	import Product from './Product.svelte';
 	import { products } from '@stores/products';
 
-	console.log(products);
-
 </script>
 
 <section class="py-2">

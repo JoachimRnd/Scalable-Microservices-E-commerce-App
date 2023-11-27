@@ -24,12 +24,18 @@ function createCart() {
 			const config = {
 				headers: { Authorization: `Bearer ${token}` },
 			};
+
+			const cartToSave = cart.map((item) => ({
+				_id: item._id,
+				quantity: item.quantity,
+			}));
+
 			const bodyParameters = {
-				cart: { items: cart },
+				cart: { items: cartToSave },
 			};
 			const response = await axios.post(`${url}/cart`, bodyParameters, config);
 		} catch (error) {
-			handleError(error, 'Save Cart');
+			handleError(error, 'save Cart');
 		}
 	};
 
@@ -45,13 +51,29 @@ function createCart() {
 
 			const response = await axios.get(`${url}/cart`, config);
 			if (response.data.cart && response.data.cart.length > 0) {
-				const cartFromServer = response.data.cart;
-				set(cartFromServer);
-			}else{
+				const productIds = response.data.cart.flatMap((item) => item._id);
+
+				if (productIds.length > 0) {
+					const productsDetailsResponse = await axios.post(
+						`${url}/products/ids`,
+						{ productIds },
+						config
+					);
+
+					const productsDetails = productsDetailsResponse.data.data;
+					const updatedCart = response.data.cart.map((item) => ({
+						...item,
+						...productsDetails.find((detail) => detail._id === item._id),
+					}));
+					set(updatedCart);
+				}
+				//const cartFromServer = response.data.cart;
+				//set(cartFromServer);
+			} else {
 				cart.update((old) => []);
 			}
 		} catch (error) {
-			handleError(error, 'Get Cart');
+			handleError(error, 'get Cart');
 		}
 	};
 
@@ -60,7 +82,7 @@ function createCart() {
 		update,
 		addToCart: (item: any) =>
 			update((oldCart) => {
-				const itemIndex = oldCart.findIndex((e) => e.id === item.id);
+				const itemIndex = oldCart.findIndex((e) => e._id === item._id);
 				const newCart =
 					itemIndex === -1
 						? [...oldCart, item]
