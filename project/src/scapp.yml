@@ -36,6 +36,7 @@ services:     # list all services for your application
       - WITH_PERSISTENT_DATA=Y          # non empty string use perisitence (with CouchDB)
       - DB_HOST=logging-db              # name of container running CouchDB
       - DB_PORT=5984                    # port number of CouchDB and logging db
+      - GATEWAY_HOST=gateway            # name of container running gateway
       - ADMIN_NAME=admin
       - ADMIN_PASSW=admin
     deploy:
@@ -89,6 +90,7 @@ services:     # list all services for your application
       - DB_HOST=users-db                # name of container running CouchDB
       - DB_PORT=5984                    # port number of CouchDB and logging db
       - DB_NAME=users                   # name of database and logging db
+      - GATEWAY_HOST=gateway            # name of container running gateway
       - ADMIN_NAME=admin
       - ADMIN_PASSW=admin
     deploy:
@@ -129,6 +131,7 @@ services:     # list all services for your application
       - DB_HOST=orders-db               # name of container running CouchDB
       - DB_PORT=5984                    # port number of CouchDB and logging db
       - DB_NAME=orders                  # name of database
+      - GATEWAY_HOST=gateway            # name of container running gateway
       - ADMIN_NAME=admin
       - ADMIN_PASSW=admin
     deploy:
@@ -169,6 +172,7 @@ services:     # list all services for your application
       - DB_HOST=shopping-carts-db       # name of container running CouchDB
       - DB_PORT=5984                    # port number of CouchDB and logging db
       - DB_NAME=shopping-carts          # name of database
+      - GATEWAY_HOST=gateway            # name of container running gateway
       - ADMIN_NAME=admin
       - ADMIN_PASSW=admin
     deploy:
@@ -208,6 +212,7 @@ services:     # list all services for your application
       - DB_HOST=products-db             # name of container running CouchDB
       - DB_PORT=5984                    # port number of CouchDB and logging db
       - DB_NAME=products                # name of database
+      - GATEWAY_HOST=gateway            # name of container running gateway
       - ADMIN_NAME=admin
       - ADMIN_PASSW=admin
     deploy:

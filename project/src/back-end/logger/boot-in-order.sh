@@ -54,5 +54,23 @@ until curl --request PUT ${DB_URL}/products-d-logs ; do
 done
 echo "DB (products-d-logs) was created!"
 
+echo "Wait (indefenitly) until the DB creation (name: user-info-logs)."
+echo "The DB URL is: ${DB_URL}"
+until curl --request PUT ${DB_URL}/user-info-logs ; do
+  echo -e "\t DB (user-info-logs) wasn't created - trying again later..."
+  sleep 2
+done
+
+curl --request PUT \
+  --url ${DB_URL}/user-info-logs/_design/products \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "views": {
+      "getUserInfo": {
+        "map": "function (doc) { if (doc.id) { emit(doc.id, doc); } }"
+      }
+    }
+  }'
+
 echo "Start users service..."
 npm start
