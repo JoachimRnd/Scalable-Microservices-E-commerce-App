@@ -1,0 +1,14 @@
+config:
+  # Replace (if needed) IP address of VM [node]
+  target: http://scapp_orders-daemon
+  phases:
+    - duration: 30
+      arrivalRate: 1000
+scenarios:
+  - flow:
+    - post:
+        url: /order/checkout
+        json:
+        order: test
+        token: test2
+

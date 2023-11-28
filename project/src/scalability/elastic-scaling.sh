@@ -74,26 +74,19 @@ function getWorkersIps {
 # Verifies that the right number of arguments were passed and whether this script
 # is launched in the swarm manager.
 #-------------------------------------------------------------------------------
-[ ${#} -ne 2 ] && endScript "wrongArgs"
-
 docker node ls &> /dev/null
 [ ${?} != 0 ] && endScript "notManager"
-
-stack=`docker stack ls | grep ${1} | awk '{print $1}'`
-[ "${stack}" == "" ] && endScript "unknownStack"
-
-service=`docker stack services ${stack} | grep ${stack}_${2}`
-[ "${service}" == "" ] && endScript "unknownService"
 
 getWorkersIps
 
 AVG="0.0"
-service="${stack}_${2}"
+#service="${stack}_${2}"
 #---  FUNCTION  ----------------------------------------------------------------
 #          NAME:  updateAvg
 #   DESCRIPTION:  Computes the average of CPU among nodes in the swarm.
 #-------------------------------------------------------------------------------
 function updateAvg {
+  local service="$1"
   sum=""
   REPLICAS=0
   id=`docker ps | grep ${service}`
@@ -114,16 +107,19 @@ function updateAvg {
       let REPLICAS=REPLICAS+1
     fi
   done
-  echo "Get avg with [${sum}]"
+  #echo "Get avg with [${sum}]"
   ok=`python -c "l = [${sum}] ;r = 1 if len(l) != 0 else 0 ;print(r) "`
   if [ ${ok} -eq 1 ]; then
     AVG=`python -c "l = [${sum}] ;print( sum(l) / len(l) ) "`
   else
     AVG="0.0"
   fi
+  #echo "AVG = ${AVG}"
 }
 
-TRESHOLD="90.0"
+TRESHOLD="80.0"
+PATIENCE_COUNT=5  # Nombre d'itérations où ${AVG} < ${TRESHOLD} === 1
+PATIENCE=0
 #---  FUNCTION  ----------------------------------------------------------------
 #          NAME:  tresholdNotReached
 #   DESCRIPTION:  Prints 1 if the CPU threshold was reached or 0 otherwise.
@@ -132,15 +128,26 @@ function tresholdNotReached {
   echo $(python -c "r = 1 if ${AVG} < ${TRESHOLD} else 0 ;print(r)")
 }
 
-while [ "$(tresholdNotReached)" == "1" ] ; do
-  updateAvg
-  echo "${AVG} < ${TRESHOLD} ? Yes, threshold not reached."
-  sleep 2
+SERVICE=$1
+WORKERS=1
+
+while true; do
+  while [ "$(tresholdNotReached)" == "1" ]; do
+    updateAvg "${SERVICE}"
+    ((PATIENCE++))
+    #echo "Service : ${SERVICE}"
+    if [ ${PATIENCE} -ge ${PATIENCE_COUNT} ] && [ ${WORKERS} -gt 1 ]; then
+      let "WORKERS=WORKERS/3"
+      echo "Reducing for service ${SERVICE} to ${WORKERS} replicas."
+      docker service scale ${SERVICE}=${WORKERS}
+      PATIENCE=0
+    fi
+    sleep 5
+  done
+  PATIENCE=0
+  AVG="0.0"
+  let "WORKERS=WORKERS*3"
+  echo "Scaling of: ${SERVICE} to ${WORKERS} replicas."
+  docker service scale ${SERVICE}=${WORKERS}
 done
-echo "${AVG} < ${TRESHOLD} ? No, threshold reached!"
-
-echo "Add new replicas of: ${service}. The total number is ${REPLICAS} replicas."
-let REPLICAS=REPLICAS*3
-docker service scale ${service}=${REPLICAS}
-
-echo "End of ${0}"
+  
