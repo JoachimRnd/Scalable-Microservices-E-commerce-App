@@ -15,8 +15,8 @@ NC=\033[0m
 full: full-build full-push                                                                                                                                                                                               
 full-build: frontend-build backend-build
 full-push: frontend-push backend-push   
-backend-build: storage-build orders-build auth-build shopping-carts-build products-build gateway-build
-backend-push: storage-push orders-push auth-push shopping-carts-push products-push gateway-push  
+backend-build: storage-build orders-build auth-build shopping-carts-build products-build gateway-build logger-build
+backend-push: storage-push orders-push auth-push shopping-carts-push products-push gateway-push logger-push
 swarm-reload: swarm-remove swarm-deploy
 scaling-reload: stop-elastic-scaling launch-elastic-scaling
 
@@ -29,6 +29,7 @@ gateway: gateway-build gateway-push
 orders: orders-build orders-push
 products: products-build products-push
 shopping-carts: shopping-carts-build shopping-carts-push
+logger: logger-build logger-push
 
 ###############                                                                                                                                                                                                               
 # Small tasks #
@@ -102,6 +103,14 @@ stop-elastic-scaling:
 	@echo -e "${GREEN}Stopping elastic scaling${NC}"
 	@./src/scalability/stop-elastic-scaling.sh
 	
+logger-build:
+	@echo -e "${GREEN}Buidling logger docker image...${NC}"
+	@docker build -t scapp-logger src/back-end/logger
+
+logger-push:
+	@docker tag scapp-logger ${DOCKER_ID}/scapp-logger
+	@docker push ${DOCKER_ID}/scapp-logger
+
 ###############
 # SWARM TASKS #
 ###############

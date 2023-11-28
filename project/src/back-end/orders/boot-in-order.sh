@@ -19,10 +19,10 @@
 #       CREATED: 10/08/2018 09:20
 #      REVISION:  ---
 #===============================================================================
-if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
-  
-  export DB_URL="http://${ADMIN_NAME}:${ADMIN_PASSW}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
 
+export DB_URL="http://${ADMIN_NAME}:${ADMIN_PASSW}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
+
+if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
   echo "Wait (indefenitly) until the DB creation (name: ${DB_NAME})."
   echo "The DB URL is: ${DB_URL}"
   until curl --request PUT ${DB_URL} ; do
