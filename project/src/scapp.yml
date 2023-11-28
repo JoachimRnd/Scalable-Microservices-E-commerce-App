@@ -18,6 +18,20 @@ services:     # list all services for your application
       - orders-daemon
       - shopping-carts-daemon
       - products-daemon
+
+  ###########
+  # Logging #
+  ###########
+  logging-db:
+    image: ${DOCKER_ID}/storage-system:latest
+    ports: ["3009:5984"]
+    deploy:
+      # deploy only one instance of this service
+      replicas: 1
+      restart_policy:
+        # restart if something went wrong
+        condition: on-failure
+    networks: [ "scapp-net" ]
   
   ############
   # frontend #
@@ -49,10 +63,11 @@ services:     # list all services for your application
     environment:
       - TOKEN_SECRET=AkbRocZI           # string to create tokens (see utils/en-de-coders.js)
       - DEBUG=users-d                   # header for loggining messages
+      - LOGGING_DB_HOST=logging-db      # name of container for loggining messages
       - WITH_PERSISTENT_DATA=Y          # non empty string use perisitence (with CouchDB)
       - DB_HOST=users-db                # name of container running CouchDB
-      - DB_PORT=5984                    # port number of CouchDB
-      - DB_NAME=users                   # name of database
+      - DB_PORT=5984                    # port number of CouchDB and logging db
+      - DB_NAME=users                   # name of database and logging db
       - ADMIN_NAME=admin
       - ADMIN_PASSW=admin
     deploy:
@@ -87,9 +102,10 @@ services:     # list all services for your application
     environment:
       - TOKEN_SECRET=AkbRocZI           # string to create tokens (see utils/en-de-coders.js)
       - DEBUG=orders-d                  # header for loggining messages
+      - LOGGING_DB_HOST=logging-db      # name of container for loggining messages
       - WITH_PERSISTENT_DATA=Y          # non empty string use perisitence (with CouchDB)
       - DB_HOST=orders-db               # name of container running CouchDB
-      - DB_PORT=5984                    # port number of CouchDB
+      - DB_PORT=5984                    # port number of CouchDB and logging db
       - DB_NAME=orders                  # name of database
       - ADMIN_NAME=admin
       - ADMIN_PASSW=admin
@@ -125,9 +141,10 @@ services:     # list all services for your application
     environment:
       - TOKEN_SECRET=AkbRocZI           # string to create tokens (see utils/en-de-coders.js)
       - DEBUG=shopping-carts-d          # header for loggining messages
+      - LOGGING_DB_HOST=logging-db      # name of container for loggining messages
       - WITH_PERSISTENT_DATA=Y          # non empty string use perisitence (with CouchDB)
       - DB_HOST=shopping-carts-db       # name of container running CouchDB
-      - DB_PORT=5984                    # port number of CouchDB
+      - DB_PORT=5984                    # port number of CouchDB and logging db
       - DB_NAME=shopping-carts          # name of database
       - ADMIN_NAME=admin
       - ADMIN_PASSW=admin
@@ -162,10 +179,11 @@ services:     # list all services for your application
     environment:
       - TOKEN_SECRET=AkbRocZI           # string to create tokens (see utils/en-de-coders.js)
       - DEBUG=products-d                # header for loggining messages
+      - LOGGING_DB_HOST=logging-db      # name of container for loggining messages
       - WITH_PERSISTENT_DATA=Y          # non empty string use perisitence (with CouchDB)
       - DB_HOST=products-db             # name of container running CouchDB
-      - DB_PORT=5984                    # port number of CouchDB
-      - DB_NAME=products               # name of database
+      - DB_PORT=5984                    # port number of CouchDB and logging db
+      - DB_NAME=products                # name of database
       - ADMIN_NAME=admin
       - ADMIN_PASSW=admin
     deploy:

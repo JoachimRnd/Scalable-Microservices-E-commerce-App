@@ -19,10 +19,11 @@
 #       CREATED: 10/08/2018 09:20
 #      REVISION:  ---
 #===============================================================================
+
+export DB_URL="http://${ADMIN_NAME}:${ADMIN_PASSW}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
+export LOGGING_DB_URL="http://${ADMIN_NAME}:${ADMIN_PASSW}@${LOGGING_DB_HOST}:${DB_PORT}/${DEBUG}"
+
 if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
-
-  export DB_URL="http://${ADMIN_NAME}:${ADMIN_PASSW}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
-
   echo "Wait (indefenitly) until the DB creation (name: ${DB_NAME})."
   echo "The DB URL is: ${DB_URL}"
   until curl --request PUT ${DB_URL} ; do

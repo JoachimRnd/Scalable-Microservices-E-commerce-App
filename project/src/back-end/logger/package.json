@@ -15,9 +15,7 @@
     "nano": "6.4.3",
 
     "gulp": "4.0.2",
-    "gulp-nodemon": "2.5.0",
-
-    "axios": "^1.5.1"
+    "gulp-nodemon": "2.5.0"
   },
   "overrides": {
     "graceful-fs": "^4.2.10"
