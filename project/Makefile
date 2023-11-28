@@ -29,8 +29,6 @@ orders: orders-build orders-push
 products: products-build products-push
 shopping-carts: shopping-carts-build shopping-carts-push
 
-
-
 ###############                                                                                                                                                                                                               
 # Small tasks #
 ############### 
@@ -90,6 +88,18 @@ gateway-push:
 	@docker tag scapp-gateway ${DOCKER_ID}/scapp-gateway
 	@docker push ${DOCKER_ID}/scapp-gateway
 
+artillery-build:
+	@echo -e "${GREEN}Buidling artillery docker image...${NC}"
+	@docker build -t scapp-artillery src/scalability/artillery
+
+launch-elastic-scaling:
+	@echo -e "${GREEN}Launching elastic scaling${NC}"
+	@./src/scalability/launch-elastic-scaling.sh
+
+stop-elastic-scaling:
+	@echo -e "${GREEN}Stopping elastic scaling${NC}"
+	@./src/scalability/stop-elastic-scaling.sh
+
 ###############
 # SWARM TASKS #
 ###############
@@ -118,6 +128,9 @@ swarm-init:
 reload: full swarm-reload
 	@echo -e "${GREEN}Reloading stack...${NC}"
 
+elastic-scaling-test: launch-elastic-scaling artillery-build
+	@echo -e "${GREEN}Running artillery test...${NC}"
+	@docker run -d --name load-test --network scapp-net scapp-artillery
 
 # Force pull from docker hub
 pull:

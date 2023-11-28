@@ -114,6 +114,7 @@ function updateAvg {
   else
     AVG="0.0"
   fi
+  echo "AVG = ${AVG}"
 }
 
 TRESHOLD="80.0"
@@ -127,7 +128,7 @@ function tresholdNotReached {
   echo $(python -c "r = 1 if ${AVG} < ${TRESHOLD} else 0 ;print(r)")
 }
 
-SERVICES=("scapp_users_daemon" "scapp_orders_daemon" "scapp_shopping-carts-daemon" "scapp_products_daemon")
+SERVICES=("scapp_users_daemon") #"scapp_orders_daemon" "scapp_shopping-carts-daemon" "scapp_products_daemon")
 
 for service in "${SERVICES[@]}"; do
 
@@ -136,7 +137,7 @@ for service in "${SERVICES[@]}"; do
       while [ "$(tresholdNotReached)" == "1" ] ; do
         updateAvg "${service}"
         ((PATIENCE++))
-
+        echo "Service : ${service}"
         if [ ${PATIENCE} -ge ${PATIENCE_COUNT} ] && [ ${REPLICAS} -gt 1 ]; then
           echo "Reducing replicas for service ${service}. The total number is ${REPLICAS} replicas."
           let "REPLICAS-=1"
@@ -144,7 +145,7 @@ for service in "${SERVICES[@]}"; do
 
           PATIENCE=0
         fi
-        sleep 10
+        sleep 3
       done
       PATIENCE=0
       echo "Add new replicas of: ${service}. The total number is ${REPLICAS} replicas."
@@ -153,6 +154,7 @@ for service in "${SERVICES[@]}"; do
     done
      
   ) &
+  echo $! > "${service}_pid.txt"
 done
 
 echo "${0} is running in background"
