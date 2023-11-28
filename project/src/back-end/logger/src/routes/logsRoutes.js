@@ -2,16 +2,33 @@ const express = require('express');
 const router = express.Router();
 
 const loggerCrud = require('../utils/crud/crud-log');
+const authMiddleware = require('../middleware/authMiddleware');
 
 const logsUser = require('nano')(`${process.env.DB_URL}/users-d-logs`);
 const logsOrders = require('nano')(`${process.env.DB_URL}/orders-d-logs`);
 const logsCarts = require('nano')(`${process.env.DB_URL}/carts-d-logs`);
 const logsProducts = require('nano')(`${process.env.DB_URL}/products-d-logs`);
-const logsInfoUser = require('nano')(`${process.env.DB_URL}/user-info-logs`);
 
 
 module.exports = () => {
   
+  router.get('/user/info/:username', authMiddleware, (req, res) => {
+    const usrName = req.params.username;
+    let result = {};
+    loggerCrud.getUserInfo(usrName, logsOrders)
+      .then((data) => result = { ...result, orders: data })
+      .catch((err) => res.status(409).json({ status: 'error', message: String(err) }));
+    console.log("result", result);  
+    loggerCrud.getUserInfo(usrName, logsCarts)
+      .then((data) => result = { ...result, carts: data })
+      .catch((err) => res.status(409).json({ status: 'error', message: String(err) }));
+
+    loggerCrud.getUserInfo(usrName, logsProducts)
+      .then((data) => result = { ...result, products: data })
+      .catch((err) => res.status(409).json({ status: 'error', message: String(err) }));
+
+    res.status(200).json({ status: 'success', data: result });
+  });
 
   router.post('/user/info', (req, res) => {
     loggerCrud.info(req.body, logsUser)

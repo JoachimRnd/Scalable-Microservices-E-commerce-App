@@ -18,7 +18,7 @@ const info = (message, data, req) => {
     return new Promise((resolve, reject) => {
         const timeDifference = computeTimeDifference(req);
         console.log('Time difference in milliseconds: ', timeDifference);
-        logger.post(`${gateway}/logger/user/info`, { message, data, request_time_ms : timeDifference})
+        logger.post(`${gateway}/logger/user/info`, { message, data, startTime: req._startTime, request_time_ms : timeDifference})
             .then((success) => {
                 resolve(success);
             })
@@ -32,7 +32,7 @@ const error = (message, data, req) => {
     return new Promise((resolve, reject) => {
         const timeDifference = computeTimeDifference(req);
         console.log('Time difference in milliseconds: ', timeDifference);
-        logger.post(`${gateway}/logger/user/error`, { message, data, request_time_ms : timeDifference })
+        logger.post(`${gateway}/logger/user/error`, { message, data, startTime: req._startTime, request_time_ms : timeDifference })
             .then((success) => {
                 resolve(success);
             })

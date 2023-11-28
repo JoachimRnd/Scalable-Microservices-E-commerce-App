@@ -29,6 +29,16 @@ until curl --request PUT ${DB_URL}/users-d-logs ; do
   sleep 2
 done
 echo "DB (users-d-logs) was created!"
+curl --request PUT \
+  --url ${DB_URL}/products-d-logs/_design/logs \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "views": {
+      "getLogsByUserId": {
+        "map": "function (doc) { if (doc.userId) { emit(doc._id, doc); } }"
+      }
+    }
+  }'
 
 echo "Wait (indefenitly) until the DB creation (name: orders-d-logs)."
 echo "The DB URL is: ${DB_URL}"
@@ -37,6 +47,16 @@ until curl --request PUT ${DB_URL}/orders-d-logs ; do
   sleep 2
 done
 echo "DB (orders-d-logs) was created!"
+curl --request PUT \
+  --url ${DB_URL}/orders-d-logs/_design/logs \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "views": {
+      "getLogsByUserId": {
+        "map": "function (doc) { if (doc.userId) { emit(doc._id, doc); } }"
+      }
+    }
+  }'
 
 echo "Wait (indefenitly) until the DB creation (name: carts-d-logs)."
 echo "The DB URL is: ${DB_URL}"
@@ -45,6 +65,17 @@ until curl --request PUT ${DB_URL}/carts-d-logs ; do
   sleep 2
 done
 echo "DB (carts-d-logs) was created!"
+curl --request PUT \
+  --url ${DB_URL}/carts-d-logs/_design/logs \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "views": {
+      "getLogsByUserId": {
+        "map": "function (doc) { if (doc.userId) { emit(doc._id, doc); } }"
+      }
+    }
+  }'
+
 
 echo "Wait (indefenitly) until the DB creation (name: products-d-logs)."
 echo "The DB URL is: ${DB_URL}"
@@ -53,21 +84,13 @@ until curl --request PUT ${DB_URL}/products-d-logs ; do
   sleep 2
 done
 echo "DB (products-d-logs) was created!"
-
-echo "Wait (indefenitly) until the DB creation (name: user-info-logs)."
-echo "The DB URL is: ${DB_URL}"
-until curl --request PUT ${DB_URL}/user-info-logs ; do
-  echo -e "\t DB (user-info-logs) wasn't created - trying again later..."
-  sleep 2
-done
-
 curl --request PUT \
-  --url ${DB_URL}/user-info-logs/_design/products \
+  --url ${DB_URL}/products-d-logs/_design/logs \
   --header 'Content-Type: application/json' \
   --data '{
     "views": {
-      "getUserInfo": {
-        "map": "function (doc) { if (doc.id) { emit(doc.id, doc); } }"
+      "getLogsByUserId": {
+        "map": "function (doc) { if (doc.userId) { emit(doc._id, doc); } }"
       }
     }
   }'

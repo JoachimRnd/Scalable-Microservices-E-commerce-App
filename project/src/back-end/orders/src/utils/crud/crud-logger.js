@@ -18,7 +18,7 @@ const info = (message, data, req) => {
     return new Promise((resolve, reject) => {
         const timeDifference = computeTimeDifference(req);
         console.log('Time difference in milliseconds: ', timeDifference);
-        logger.post(`${gateway}/logger/orders/info`, { message, data, request_time_ms : timeDifference})
+        logger.post(`${gateway}/logger/orders/info`, { message, data, startTime: req._startTime, request_time_ms : timeDifference})
             .then((success) => {
                 resolve(success);
             })
@@ -32,18 +32,8 @@ const error = (message, data, req) => {
     return new Promise((resolve, reject) => {
         const timeDifference = computeTimeDifference(req);
         console.log('Time difference in milliseconds: ', timeDifference);
-        logger.post(`${gateway}/logger/orders/error`, { message, data, request_time_ms : timeDifference })
+        logger.post(`${gateway}/logger/orders/error`, { message, data, startTime: req._startTime, request_time_ms : timeDifference })
             .then((success) => {
-                // if (req.userId) {
-                //     const newMessage = `${message} - ${req.userId}`;
-                //     userInfo(newMessage, success._id, req.userId)
-                //     .then((success) => {
-                //         resolve(success);
-                //     })
-                //     .catch((error) => {
-                //         reject(error);
-                //     });
-                // }
                 resolve(success);
             })
             .catch((error) => {
@@ -51,18 +41,6 @@ const error = (message, data, req) => {
             });
     });
 }
-
-// const userInfo = (message, log_id, id) => {
-//     return new Promise((resolve, reject) => {
-//         logger.post(`${gateway}/userInfo`, { message, log_id, id, database_name: 'orders' })
-//             .then((success) => {
-//                 resolve(success);
-//             })
-//             .catch((error) => {
-//                 reject(error);
-//             });
-//     });
-// }
 
 module.exports = {
     info,
