@@ -18,6 +18,7 @@ full-push: frontend-push backend-push
 backend-build: storage-build orders-build auth-build shopping-carts-build products-build gateway-build
 backend-push: storage-push orders-push auth-push shopping-carts-push products-push gateway-push  
 swarm-reload: swarm-remove swarm-deploy
+scaling-reload: stop-elastic-scaling launch-elastic-scaling
 
 # Docker tasks
 frontend: frontend-build frontend-push
@@ -96,10 +97,11 @@ launch-elastic-scaling:
 	@echo -e "${GREEN}Launching elastic scaling${NC}"
 	@./src/scalability/launch-elastic-scaling.sh
 
+ 
 stop-elastic-scaling:
 	@echo -e "${GREEN}Stopping elastic scaling${NC}"
 	@./src/scalability/stop-elastic-scaling.sh
-
+	
 ###############
 # SWARM TASKS #
 ###############
@@ -107,8 +109,10 @@ stop-elastic-scaling:
 swarm-deploy:
 	@echo "${GREEN}Deploying stack to swarm...${NC}"
 	@docker stack deploy --resolve-image always -c src/scapp.yml scapp
+	@make stop-elastic-scaling
+	@make launch-elastic-scaling
 
-swarm-remove:
+swarm-remove: stop-elastic-scaling
 	@echo -e "${GREEN}Removing stack from swarm...${NC}"
 	@docker stack rm scapp
 
@@ -128,9 +132,21 @@ swarm-init:
 reload: full swarm-reload
 	@echo -e "${GREEN}Reloading stack...${NC}"
 
-elastic-scaling-test: launch-elastic-scaling artillery-build
+elastic-scaling-users-daemon-test: launch-elastic-scaling artillery-build
 	@echo -e "${GREEN}Running artillery test...${NC}"
-	@docker run -d --name load-test --network scapp-net scapp-artillery
+	@docker run -d --name load-test --network scapp-net scapp-artillery ./entrypoints-users.sh
+
+elastic-scaling-orders-daemon-test: launch-elastic-scaling artillery-build
+	@echo -e "${GREEN}Running artillery test...${NC}"
+	@docker run -d --name load-test --network scapp-net scapp-artillery ./entrypoints-orders.sh
+
+elastic-scaling-shopping-carts-daemon-test: launch-elastic-scaling artillery-build
+	@echo -e "${GREEN}Running artillery test...${NC}"
+	@docker run -d --name load-test --network scapp-net scapp-artillery ./entrypoints-shopping-carts.sh	
+
+elastic-scaling-products-daemon-test: launch-elastic-scaling artillery-build
+	@echo -e "${GREEN}Running artillery test...${NC}"
+	@docker run -d --name load-test --network scapp-net scapp-artillery ./entrypoints-products.sh
 
 # Force pull from docker hub
 pull:

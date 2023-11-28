@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SERVICES=("scapp_users_daemon") #"scapp_orders_daemon" "scapp_shopping-carts-daemon" "scapp_products_daemon")
+SERVICES=("scapp_users-daemon" "scapp_orders-daemon" "scapp_shopping-carts-daemon" "scapp_products-daemon")
 
 for service in "${SERVICES[@]}"; do
   if [ -f "${service}_pid.txt" ]; then

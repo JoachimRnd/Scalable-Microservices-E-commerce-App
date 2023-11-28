@@ -1,0 +1,10 @@
+config:
+  # Replace (if needed) IP address of VM [node]
+  target: http://shopping-carts-daemon
+  phases:
+    - duration: 30
+      arrivalRate: 1500
+scenarios:
+  - flow:
+    - get:
+        url: /cart
