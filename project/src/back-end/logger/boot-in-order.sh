@@ -20,30 +20,39 @@
 #      REVISION:  ---
 #===============================================================================
 
-export DB_URL="http://${ADMIN_NAME}:${ADMIN_PASSW}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
-export LOGGING_DB_URL="http://${ADMIN_NAME}:${ADMIN_PASSW}@${LOGGING_DB_HOST}:${DB_PORT}/${DEBUG}"
+export DB_URL="http://${ADMIN_NAME}:${ADMIN_PASSW}@${DB_HOST}:${DB_PORT}"
 
-if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
+echo "Wait (indefenitly) until the DB creation (name: users-d-logs)."
+echo "The DB URL is: ${DB_URL}"
+until curl --request PUT ${DB_URL}/users-d-logs ; do
+  echo -e "\t DB (users-d-logs) wasn't created - trying again later..."
+  sleep 2
+done
+echo "DB (users-d-logs) was created!"
 
-  echo "Wait (indefenitly) until the DB creation (name: ${DB_NAME})."
-  echo "The DB URL is: ${DB_URL}"
-  until curl --request PUT ${DB_URL} ; do
-    echo -e "\t DB (${DB_NAME}) wasn't created - trying again later..."
-    sleep 2
-  done
-  echo "DB (${DB_NAME}) was created!"
+echo "Wait (indefenitly) until the DB creation (name: orders-d-logs)."
+echo "The DB URL is: ${DB_URL}"
+until curl --request PUT ${DB_URL}/orders-d-logs ; do
+  echo -e "\t DB (orders-d-logs) wasn't created - trying again later..."
+  sleep 2
+done
+echo "DB (orders-d-logs) was created!"
 
-  echo "Creating admin user..."
-  curl --request POST ${DB_URL}/users \
-       --url ${DB_URL}/_design/users \
-      --header 'Content-Type: application/json' \
-      --data '{
-          "_id": "admin",
-          "_rev": "1-dcd13cfc741d5b83a6b56362c919eefa",
-          "passw": "$2a$10$Ww9VgZ0o.tf7fGkp2AyQuuyBtIFmYjuB/8SidowNz.U46cqSbpoKa",
-          "role": "admin"
-      }'
+echo "Wait (indefenitly) until the DB creation (name: carts-d-logs)."
+echo "The DB URL is: ${DB_URL}"
+until curl --request PUT ${DB_URL}/carts-d-logs ; do
+  echo -e "\t DB (carts-d-logs) wasn't created - trying again later..."
+  sleep 2
+done
+echo "DB (carts-d-logs) was created!"
 
-fi
+echo "Wait (indefenitly) until the DB creation (name: products-d-logs)."
+echo "The DB URL is: ${DB_URL}"
+until curl --request PUT ${DB_URL}/products-d-logs ; do
+  echo -e "\t DB (products-d-logs) wasn't created - trying again later..."
+  sleep 2
+done
+echo "DB (products-d-logs) was created!"
+
 echo "Start users service..."
 npm start

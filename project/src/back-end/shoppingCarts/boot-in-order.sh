@@ -21,7 +21,6 @@
 #===============================================================================
 
 export DB_URL="http://${ADMIN_NAME}:${ADMIN_PASSW}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
-export LOGGING_DB_URL="http://${ADMIN_NAME}:${ADMIN_PASSW}@${LOGGING_DB_HOST}:${DB_PORT}/${DEBUG}"
 
 if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
   echo "Wait (indefenitly) until the DB creation (name: ${DB_NAME})."
