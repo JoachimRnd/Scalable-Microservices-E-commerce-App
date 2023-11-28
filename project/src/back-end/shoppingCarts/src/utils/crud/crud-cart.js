@@ -28,6 +28,32 @@ const getCartById = (id) => {
   });
 };
 
+
+const deleteItemFromCart = (userId, itemId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const existingCart = await getCartById(userId);
+      if (existingCart.length === 0) {
+        reject(new Error('Cart not found'));
+        return;
+      }
+      const cart = existingCart[0];
+
+      if (cart._id !== userId) {
+        reject(new Error('Not authorized'));
+        return;
+      }
+
+      const updatedItems = cart.items.filter(item => item._id !== itemId);
+      cart.items = updatedItems;
+      await saveCart(cart);
+      resolve('Item successfully deleted from the cart');
+    } catch (error) {
+      reject(new Error(`Error deleting item from the cart. Reason: ${error.message}.`));
+    }
+  });
+};
+
 const deleteCart = (id, revision) => {
   return new Promise((resolve, reject) => {
     shoppingCarts.destroy(id, revision, (err, success) => {
@@ -45,5 +71,6 @@ const deleteCart = (id, revision) => {
 module.exports = {
   saveCart,
   getCartById,
-  deleteCart
+  deleteItemFromCart,
+  deleteCart,
 };
