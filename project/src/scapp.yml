@@ -46,6 +46,15 @@ services:     # list all services for your application
     depends_on: [ "users-db" ]
     # expose port number 3000 of host running this service
     ports: [ "3000:80" ]
+    environment:
+      - TOKEN_SECRET=AkbRocZI           # string to create tokens (see utils/en-de-coders.js)
+      - DEBUG=users-d                   # header for loggining messages
+      - WITH_PERSISTENT_DATA=Y          # non empty string use perisitence (with CouchDB)
+      - DB_HOST=users-db                # name of container running CouchDB
+      - DB_PORT=5984                    # port number of CouchDB
+      - DB_NAME=users                   # name of database
+      - ADMIN_NAME=admin
+      - ADMIN_PASSW=admin
     deploy:
       replicas: 1
       restart_policy:
@@ -75,6 +84,15 @@ services:     # list all services for your application
     depends_on: [ "orders-db" ]
     # expose port number 3004 of host running this service
     ports: [ "3004:80" ]
+    environment:
+      - TOKEN_SECRET=AkbRocZI           # string to create tokens (see utils/en-de-coders.js)
+      - DEBUG=orders-d                  # header for loggining messages
+      - WITH_PERSISTENT_DATA=Y          # non empty string use perisitence (with CouchDB)
+      - DB_HOST=orders-db               # name of container running CouchDB
+      - DB_PORT=5984                    # port number of CouchDB
+      - DB_NAME=orders                  # name of database
+      - ADMIN_NAME=admin
+      - ADMIN_PASSW=admin
     deploy:
       replicas: 1
       restart_policy:
@@ -104,6 +122,15 @@ services:     # list all services for your application
     depends_on: [ "shopping-carts-db" ]
     # expose port number 3004 of host running this service
     ports: [ "3005:80" ]
+    environment:
+      - TOKEN_SECRET=AkbRocZI           # string to create tokens (see utils/en-de-coders.js)
+      - DEBUG=shopping-carts-d          # header for loggining messages
+      - WITH_PERSISTENT_DATA=Y          # non empty string use perisitence (with CouchDB)
+      - DB_HOST=shopping-carts-db       # name of container running CouchDB
+      - DB_PORT=5984                    # port number of CouchDB
+      - DB_NAME=shopping-carts          # name of database
+      - ADMIN_NAME=admin
+      - ADMIN_PASSW=admin
     deploy:
       replicas: 1
       restart_policy:
@@ -132,6 +159,15 @@ services:     # list all services for your application
     depends_on: [ "products-db" ]
     # expose port number 3004 of host running this service
     ports: [ "3007:80" ]
+    environment:
+      - TOKEN_SECRET=AkbRocZI           # string to create tokens (see utils/en-de-coders.js)
+      - DEBUG=products-d                # header for loggining messages
+      - WITH_PERSISTENT_DATA=Y          # non empty string use perisitence (with CouchDB)
+      - DB_HOST=products-db             # name of container running CouchDB
+      - DB_PORT=5984                    # port number of CouchDB
+      - DB_NAME=products               # name of database
+      - ADMIN_NAME=admin
+      - ADMIN_PASSW=admin
     deploy:
       replicas: 1
       restart_policy:
