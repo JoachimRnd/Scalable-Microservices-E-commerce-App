@@ -36,6 +36,7 @@ module.exports = (cartCrud) => {
     }
   });
 
+
   router.delete('/', authMiddleware, async (req, res) => {
     try {
       const userId = req.userId;
@@ -47,6 +48,20 @@ module.exports = (cartCrud) => {
       const revision = existingCart[0]._rev;
       await cartCrud.deleteCart(userId, revision);
       res.status(200).json({ status: 'success', message: 'Cart successfully deleted' });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ status: 'error', message: 'Internal Server Error' });
+    }
+  });
+
+
+  router.delete('/:itemId', authMiddleware, async (req, res) => {
+    try {
+      const userId = req.userId;
+      const itemId = req.params.itemId;
+      await cartCrud.deleteItemFromCart(userId, itemId);
+  
+      res.status(200).json({ status: 'success', message: 'Item successfully deleted from the cart' });
     } catch (error) {
       console.log(error);
       res.status(500).json({ status: 'error', message: 'Internal Server Error' });
