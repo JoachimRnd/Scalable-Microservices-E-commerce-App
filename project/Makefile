@@ -1,4 +1,6 @@
- # Variables                                                                                                                                                                                                    
+# Variables  
+
+# DOCKER_ID = ""
                                                                                                                                                                                                               
 # Colors                                                                                                                                                                                                       
 RED=\033[0;31m                                                                                                                                                                                                 
@@ -26,6 +28,8 @@ gateway: gateway-build gateway-push
 orders: orders-build orders-push
 products: products-build products-push
 shopping-carts: shopping-carts-build shopping-carts-push
+
+
 
 ###############                                                                                                                                                                                                               
 # Small tasks #
