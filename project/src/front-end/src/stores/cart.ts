@@ -7,7 +7,7 @@ import { addToast } from "@stores/toasts";
 function createCart() {
 	const { subscribe, set, update } = writable([]);
 
-	const handleError = (error: any, message: string) => {
+	const handleError = (error, message) => {
 		console.error(`${message}:`, error);
 		addToast({
 			message: `Failed to ${message.toLowerCase()}`,
@@ -17,7 +17,7 @@ function createCart() {
 		});
 	};
 
-	const saveCart = async (cart: any) => {
+	const saveCart = async (cart) => {
 		try {
 			const localUser = window.localStorage.getItem('auth');
 			const token = JSON.parse(localUser).token;
@@ -33,7 +33,7 @@ function createCart() {
 			const bodyParameters = {
 				cart: { items: cartToSave },
 			};
-			const response = await axios.post(`${url}/cart`, bodyParameters, config);
+			await axios.post(`${url}/cart`, bodyParameters, config);
 		} catch (error) {
 			handleError(error, 'save Cart');
 		}
@@ -61,14 +61,25 @@ function createCart() {
 					);
 
 					const productsDetails = productsDetailsResponse.data.data;
-					const updatedCart = response.data.cart.map((item) => ({
-						...item,
-						...productsDetails.find((detail) => detail._id === item._id),
-					}));
+
+					const updatedCart = response.data.cart.map((item) => {
+						const productDetail = productsDetails.find((detail) => detail._id === item._id);
+						return productDetail
+						  ? { ...item, ...productDetail }
+						  : {
+							  ...item,
+							  name: "Deleted from the store",
+							  price: 0,
+							  image: "https://cdn-icons-png.flaticon.com/512/1178/1178479.png",
+							  category: "Not found",
+							};
+					  });
+
+
 					set(updatedCart);
+				} else {
+					cart.update((old) => []);
 				}
-				//const cartFromServer = response.data.cart;
-				//set(cartFromServer);
 			} else {
 				cart.update((old) => []);
 			}
@@ -80,7 +91,7 @@ function createCart() {
 	return {
 		subscribe,
 		update,
-		addToCart: (item: any) =>
+		addToCart: (item) =>
 			update((oldCart) => {
 				const itemIndex = oldCart.findIndex((e) => e._id === item._id);
 				const newCart =
@@ -88,7 +99,7 @@ function createCart() {
 						? [...oldCart, item]
 						: (() => {
 							oldCart[itemIndex].quantity += item.quantity;
-							return oldCart;
+							return oldCart.slice();
 						})();
 
 				saveCart(newCart);
@@ -97,7 +108,7 @@ function createCart() {
 		saveCart: () => {
 			saveCart($cart);
 		},
-		getCart
+		getCart,
 	};
 }
 

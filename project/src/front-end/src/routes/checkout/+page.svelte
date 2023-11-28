@@ -36,15 +36,29 @@
 				);
 
 				const productsDetails = productsDetailsResponse.data.data;
+
+	
+
 				prevCheckout = orders.map((order) => ({
 					...order,
-					items: order.items.map((item) => ({
-						...item,
-						...productsDetails.find(
+					items: order.items.map((item) => {
+						const productDetail = productsDetails.find(
 							(detail) => detail._id === item._id,
-						),
-					})),
+						);
+
+						return productDetail
+							? { ...item, ...productDetail }
+							: {
+									...item,
+									name: "Deleted from the store",
+									price: 0,
+									image: "https://cdn-icons-png.flaticon.com/512/1178/1178479.png",
+									category: "Not found",
+							  };
+					}),
 				}));
+
+				
 			} else {
 				prevCheckout = [];
 			}

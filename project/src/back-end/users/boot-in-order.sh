@@ -29,13 +29,10 @@ if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
   echo "DB (${DB_NAME}) was created!"
 
   echo "Creating admin user..."
-  curl --request POST ${DB_URL}/users \
-       --url ${DB_URL}/_design/users \
-      --header 'Content-Type: application/json' \
-      --data '{
+  curl --request PUT ${DB_URL}/admin \
+      -d '{
           "_id": "admin",
-          "_rev": "1-dcd13cfc741d5b83a6b56362c919eefa",
-          "passw": "$2a$10$Ww9VgZ0o.tf7fGkp2AyQuuyBtIFmYjuB/8SidowNz.U46cqSbpoKa",
+          "passw": "$2a$10$.R6nexERN6xtXMltIwjxM.n0Ea5pKtQwI0ddbeNbKWJ2msRynZH/u",
           "role": "admin"
       }'
 
