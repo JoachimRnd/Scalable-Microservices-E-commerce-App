@@ -182,7 +182,7 @@ The Order service exposes two routes:
 
 - **POST /order/checkout**: Create a new order in the database for the authenticated user. The body of the request must be a json object with the following fields:
   - ***items***: An array of json objects containing the orders. Each item has the following fields:
-    - ***id***: The id of the order.
+    - ***id***: The id of the product item to checkout.
     - ***quantity***: The quantity of the item to checkout.
   - ***extras***: A json object containing the extras information about the order.
     - ***totalQuantity***: The total quantity of the order.
