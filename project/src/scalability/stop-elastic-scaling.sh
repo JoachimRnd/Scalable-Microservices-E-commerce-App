@@ -9,6 +9,6 @@ for service in "${SERVICES[@]}"; do
     kill $pid
     rm "${service}_pid.txt"
   else
-    echo "No PID file found for service ${service}"
+    echo "Elastic scaling : No PID file found for service ${service}"
   fi
 done

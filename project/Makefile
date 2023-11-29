@@ -18,7 +18,7 @@ full-push: frontend-push backend-push
 backend-build: storage-build orders-build auth-build shopping-carts-build products-build gateway-build logger-build
 backend-push: storage-push orders-push auth-push shopping-carts-push products-push gateway-push logger-push
 swarm-reload: swarm-remove swarm-deploy
-scaling-reload: stop-elastic-scaling launch-elastic-scaling
+scaling-reload: stop-elastic-scaling
 
 # Docker tasks
 frontend: frontend-build frontend-push
@@ -118,8 +118,8 @@ logger-push:
 swarm-deploy:
 	@echo "${GREEN}Deploying stack to swarm...${NC}"
 	@docker stack deploy --resolve-image always -c src/scapp.yml scapp
-	@make stop-elastic-scaling
-	@make launch-elastic-scaling
+#@make stop-elastic-scaling
+#@make launch-elastic-scaling
 
 swarm-remove: stop-elastic-scaling
 	@echo -e "${GREEN}Removing stack from swarm...${NC}"
@@ -139,7 +139,7 @@ swarm-init:
 	@docker network create --driver overlay --attachable scapp-net
 
 reload: full swarm-reload
-	@echo -e "${GREEN}Reloading stack...${NC}"
+	@echo -e "${GREEN}Stack reloaded...${NC}"
 
 elastic-scaling-users-daemon-test: launch-elastic-scaling artillery-build
 	@echo -e "${GREEN}Running artillery test...${NC}"
@@ -167,3 +167,4 @@ pull:
 	@docker pull ${DOCKER_ID}/scapp-shopping-carts
 	@docker pull ${DOCKER_ID}/scapp-products
 	@docker pull ${DOCKER_ID}/scapp-gateway
+	@docker pull ${DOCKER_ID}/scapp-logger

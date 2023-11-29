@@ -1,7 +1,6 @@
 const logger = require('axios')
 
 const gateway = `http://${process.env.GATEWAY_HOST}`
-console.log('gateway', gateway);
 
 if (!process.env.GATEWAY_HOST) {
     throw new Error('GATEWAY_HOST is not set');
