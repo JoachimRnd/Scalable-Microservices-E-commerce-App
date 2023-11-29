@@ -64,6 +64,10 @@ database.
 
 ### Associated technologies
 
+This service use different technologies to provide an authentification but mainly:
+- **Gulp**: A javascript task runner to build the application.
+- **JWT**: A javascript library to generate and verify JSON Web Tokens, very userful for stateless applications.
+
 ### How to build the container
 
 To build the container for the user service, run the following command in
@@ -91,12 +95,12 @@ The authentification service has two commands:
   - ***password***: The password of the user.
 
   If the user is created successfully, the service will return a json object with the following fields:
-  - ***token***: The token for this user valid for 14 days.  
+  - ***token***: The token for this user valid for 14 days. Containing the creating time, the expiration date, the username and his role.  
 
 - **GET /user/:username/:password**: If the username and password are correct, the service will return a json object with the following fields:
   - ***status***: The status of the request (success, error).
   - ***data***:  
-    - ***token***: The token for this user valid for 14 days.
+    - ***token***: The token for this user valid for 14 days. Containing the creating time, the expiration date, the username and his role.
     - ***role***: The role of the user (admin, user).
 
 In case of error, the service will return a json object with the following fields:
@@ -133,11 +137,46 @@ In case of error, the service will return a json object with the following field
 
 ### Role of the service
 
+The product service is used to manage the products of the application. It is composed of a REST API and a database. The REST API is used to create, read, update and delete products from the database. 
+
 ### Associated technologies
+
+This service use different technologies to provide an authentification but mainly:
+- **Gulp**: A javascript task runner to build the application.
+- **JWT**: A javascript library to generate and verify JSON Web Tokens, very userful for stateless applications, used in this case to check the role of the user (using the provided token).
 
 ### How to build the container
 
+To build the container for the product service, run the following command in
+the project directory:
+
+:heavy_exclamation_mark: If you do not have the your docker id exported in a `DOCKER_ID` variable in your environment, you can either export it or uncomment the `DOCKER_ID` variable
+
+```bash
+# To build and push to docker hub the entire product service
+make products
+
+# To only build the product container
+make products-build
+
+# To only push the product container to docker hub
+make products-push
+```
+
+
 ### API of the service
+
+The product service has five commands:
+
+- **GET /products**: Get all the products from the database. The service will return a json object with the following fields:
+  - ***status***: The status of the request (success, error).
+  - ***data***: An array of json objects containing the products. Each product has the following fields:
+    - ***_id***: The id of the product given by the `CouchDB`.
+    - ***_rev***: The revision of the product given by the `CouchDB`.
+    - ***name***: The name of the product.
+    - ***price***: The price of the product.
+    - ***image***: The image of the product as URL.
+    - ***category***: The category of the product.
 
 
 <!--  -->
