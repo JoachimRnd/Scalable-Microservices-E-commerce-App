@@ -11,4 +11,6 @@ scenarios:
         json:
         order: test
         token: test2
+        headers:
+          authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MDI0MTE0MzUsImlhdCI6MTcwMTIwMTgzNSwic3ViIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4ifQ.wWU8Xkm6lwfzJx9uLBhs2dDgNsyDFgT1hsKKzbjRIVM
 
