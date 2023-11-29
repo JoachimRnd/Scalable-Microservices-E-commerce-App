@@ -180,7 +180,7 @@ make orders-push
 
 The Order service exposes two routes:
 
-- **POST /checkout**: Create a new order in the database for the authenticated user. The body of the request must be a json object with the following fields:
+- **POST /order/checkout**: Create a new order in the database for the authenticated user. The body of the request must be a json object with the following fields:
   - ***items***: An array of json objects containing the orders. Each item has the following fields:
     - ***id***: The id of the order.
     - ***quantity***: The quantity of the item to checkout.
@@ -189,7 +189,7 @@ The Order service exposes two routes:
     - ***totalPrice***: The total price of the order.
     - ***date***: The date of the order.
 
-- **GET /user/orders**: Retrieves all orders associated with the authenticated user. The service returns a JSON object with the following fields:
+- **GET /order/user/orders**: Retrieves all orders associated with the authenticated user. The service returns a JSON object with the following fields:
   - ***status***: The status of the request (success, error).
   - ***_id***: The id of the order given by the `CouchDB`.
   - ***_rev***: The revision of the order given by the `CouchDB`.
@@ -212,11 +212,56 @@ In case of error, the service will return a json object with the following field
 
 ### Role of the service
 
+The Shopping cart service is responsible for managing the cart of each user within the application. It provides a REST API for creating, deleting and retrieving cart, and it interacts with a database to store the information. The service ensures that each cart are associated with the correct user by utilizing an authentication middleware and by storing the cart with the id of the user.
+
 ### Associated technologies
+
+- **Gulp**: A javascript task runner to build the application.
+- **JWT**: A javascript library to generate and verify JSON Web Tokens, very userful for stateless applications, used in this case to check the role of the user (using the provided token).
 
 ### How to build the container
 
+To build the container for the shopping cart service, run the following command in
+the project directory:
+
+```bash
+# Build and push the entire Shopping cart service to Docker Hub
+make shopping-carts
+
+# Build only the Shopping cart service container
+make shopping-carts-build
+
+# Push only the Shopping cart service container to Docker Hub
+make shopping-carts-push
+```
+
 ### API of the service
+
+The Shopping cart service exposes four routes:
+
+- **POST /cart**: Create a new cart in the database for the authenticated user. The body of the request must be a json object with the following fields:
+  - ***items***: An array of json objects containing the items to add to the cart. Each item has the following fields:
+    - ***id***: The id of the product item.
+    - ***quantity***: The quantity of the item added to the cart.
+
+- **GET /cart**: Retrieves the cart associated with the authenticated user. The service returns a JSON object with the following fields:
+  - ***status***: The status of the request (success, error).
+  - ***_id***: The id of the cart given by the `CouchDB` which is equal to the userId.
+  - ***_rev***: The revision of the cart given by the `CouchDB`.
+  - ***items***: An array of json objects containing the items in the cart. Each product item has the following fields:
+    - ***id***: The id of the product item.
+    - ***quantity***: The quantity of the item added to the cart.
+
+- **DELETE /cart**: Delete the entire cart of a user in the database.
+  - The **userId** is retrieved from the token 
+
+- **DELETE /cart/:itemId**: Delete a specific item by id in the cart of a user in the database. 
+  - The **userId** is retrieved from the token
+  - **ItemId** is retrieved from the params
+
+In case of error, the service will return a json object with the following fields:
+- ***message***: The error message.
+- ***status***: The status of the request (success, error).
 
 
 <!--  -->
