@@ -24,33 +24,42 @@ export DB_URL="http://${ADMIN_NAME}:${ADMIN_PASSW}@${DB_HOST}:${DB_PORT}/${DB_NA
 export LOGGING_DB_URL="http://${ADMIN_NAME}:${ADMIN_PASSW}@${LOGGING_DB_HOST}:${DB_PORT}/${DEBUG}"
 
 if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
-  echo "Wait (indefinitely) until the DB creation (name: ${DB_NAME})."
-  echo "The DB URL is: ${DB_URL}"
-  until curl --request PUT ${DB_URL} ; do
-    echo -e "\t DB (${DB_NAME}) wasn't created - trying again later..."
-    sleep 2
-  done
+  echo "Checking if the DB (${DB_NAME}) exists..."
+  DB_CHECK=$(curl --silent --request GET ${DB_URL})
 
-  echo "Inserting views into the database..."
+  echo "db chekc: ${DB_CHECK}"
 
-  curl --request PUT \
-  --url ${DB_URL}/_design/products \
-  --header 'Content-Type: application/json' \
-  --data '{
-    "views": {
-      "getProducts": {
-        "map": "function (doc) { emit(doc._id, doc); }"
-      },
-      "getProductsByIds": {
-        "map": "function (doc) { if (doc._id) { emit(doc._id, doc); } }"
+  if [ -z "$DB_CHECK" ] || [[ "$DB_CHECK" == *"error"* ]]; then
+    echo "Wait (indefinitely) until the DB creation (name: ${DB_NAME})."
+    echo "The DB URL is: ${DB_URL}"
+    until curl --request PUT ${DB_URL} ; do
+      echo -e "\t DB (${DB_NAME}) wasn't created - trying again later..."
+      sleep 2
+    done
+
+    echo "Inserting views into the database..."
+
+    curl --request PUT \
+    --url ${DB_URL}/_design/products \
+    --header 'Content-Type: application/json' \
+    --data '{
+      "views": {
+        "getProducts": {
+          "map": "function (doc) { emit(doc._id, doc); }"
+        },
+        "getProductsByIds": {
+          "map": "function (doc) { if (doc._id) { emit(doc._id, doc); } }"
+        }
       }
-    }
-  }'
+    }'
 
-  echo "DB (${DB_NAME}) was created!"
+    echo "DB (${DB_NAME}) was created!"
 
-  echo "Running db-init.js..."
-  node db-init.js
+    echo "Running db-init.js..."  
+    node db-init.js
+  else
+    echo "DB (${DB_NAME}) already exists!"
+  fi 
 fi
 
 echo "Start users service..."

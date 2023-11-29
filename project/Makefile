@@ -1,6 +1,6 @@
 # Variables  
 
-# DOCKER_ID = ""
+# DOCKER_ID = "mxdx02"
                                                                                                                                                                                                               
 # Colors                                                                                                                                                                                                       
 RED=\033[0;31m                                                                                                                                                                                                 
@@ -18,7 +18,8 @@ full-push: frontend-push backend-push
 backend-build: storage-build orders-build auth-build shopping-carts-build products-build gateway-build logger-build
 backend-push: storage-push orders-push auth-push shopping-carts-push products-push gateway-push logger-push
 swarm-reload: swarm-remove swarm-deploy
-scaling-reload: stop-elastic-scaling
+scaling-reload: stop-elastic-scaling launch-elastic-scaling
+swarm-reload-with-scaling: swarm-remove swarm-deploy-with-scaling
 
 # Docker tasks
 frontend: frontend-build frontend-push
@@ -118,8 +119,8 @@ logger-push:
 swarm-deploy:
 	@echo "${GREEN}Deploying stack to swarm...${NC}"
 	@docker stack deploy --resolve-image always -c src/scapp.yml scapp
-#@make stop-elastic-scaling
-#@make launch-elastic-scaling
+
+swarm-deploy-with-scaling: swarm-deploy stop-elastic-scaling launch-elastic-scaling
 
 swarm-remove: stop-elastic-scaling
 	@echo -e "${GREEN}Removing stack from swarm...${NC}"
@@ -141,22 +142,25 @@ swarm-init:
 reload: full swarm-reload
 	@echo -e "${GREEN}Stack reloaded...${NC}"
 
+
+#################
+# SCALING TASKS #
+#################
 elastic-scaling-users-daemon-test: launch-elastic-scaling artillery-build
 	@echo -e "${GREEN}Running artillery test...${NC}"
-	@docker run -d --name load-test --network scapp-net scapp-artillery ./entrypoints-users.sh
+	@docker run -d --name users-load-test-$$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1) --network scapp-net scapp-artillery ./entrypoints-users.sh
 
 elastic-scaling-orders-daemon-test: launch-elastic-scaling artillery-build
 	@echo -e "${GREEN}Running artillery test...${NC}"
-	@docker run -d --name load-test --network scapp-net scapp-artillery ./entrypoints-orders.sh
+	@docker run -d --name orders-load-test-$$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1) --network scapp-net scapp-artillery ./entrypoints-orders.sh
 
 elastic-scaling-shopping-carts-daemon-test: launch-elastic-scaling artillery-build
 	@echo -e "${GREEN}Running artillery test...${NC}"
-	@docker run -d --name load-test --network scapp-net scapp-artillery ./entrypoints-shopping-carts.sh	
+	@docker run -d --name carts-load-test-$$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1) --network scapp-net scapp-artillery ./entrypoints-shopping-carts.sh	
 
 elastic-scaling-products-daemon-test: launch-elastic-scaling artillery-build
 	@echo -e "${GREEN}Running artillery test...${NC}"
-	@docker run -d --name load-test --network scapp-net scapp-artillery ./entrypoints-products.sh
-
+	@docker run -d --name products-load-test-$$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1) --network scapp-net scapp-artillery ./entrypoints-products.sh
 # Force pull from docker hub
 pull:
 	@echo -e "${GREEN}Pulling images from docker hub...${NC}"

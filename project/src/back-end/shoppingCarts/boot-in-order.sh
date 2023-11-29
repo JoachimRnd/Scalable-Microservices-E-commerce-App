@@ -23,9 +23,10 @@
 export DB_URL="http://${ADMIN_NAME}:${ADMIN_PASSW}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
 
 if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
-  echo "Wait (indefenitly) until the DB creation (name: ${DB_NAME})."
+
+  echo "Wait (indefinitely) until the DB creation (name: ${DB_NAME})."
   echo "The DB URL is: ${DB_URL}"
-  until curl --request PUT ${DB_URL} ; do
+  until curl --silent --request PUT ${DB_URL} ; do
     echo -e "\t DB (${DB_NAME}) wasn't created - trying again later..."
     sleep 2
   done
@@ -40,7 +41,6 @@ if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
         }
       }
     }'
-  
   echo "DB (${DB_NAME}) was created!"
 fi
 echo "Start users service..."
