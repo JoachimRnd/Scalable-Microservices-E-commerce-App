@@ -153,11 +153,37 @@ In case of error, the service will return a json object with the following field
 
 ### Role of the service
 
+The Order service is responsible for managing orders within the application. It provides a REST API for creating and retrieving orders, and it interacts with a database to store order information. The service ensures that orders are associated with the correct user by utilizing an authentication middleware.
+
 ### Associated technologies
+
+- **Node.js** and **Express**: The service is built using Node.js and the Express framework to handle HTTP requests and manage routes.
+- **CouchDB**: A NoSQL database used for storing order information. Views are created within CouchDB to facilitate queries related to user-specific orders.
+- **Gulp**: A javascript task runner to build the application.
+- **JWT**: A javascript library to generate and verify JSON Web Tokens, very userful for stateless applications, used in this case to check the role of the user (using the provided token).
 
 ### How to build the container
 
+To build the container for the order service, run the following command in
+the project directory:
+
+```bash
+# Build and push the entire Order service to Docker Hub
+make orders
+
+# Build only the Order service container
+make orders-build
+
+# Push only the Order service container to Docker Hub
+make orders-push
+```
+
 ### API of the service
+
+
+In case of error, the service will return a json object with the following fields:
+- ***message***: The error message.
+- ***status***: The status of the request (success, error).
 
 <!--  -->
 
@@ -182,7 +208,9 @@ The product service is used to manage the products of the application. It is com
 
 ### Associated technologies
 
-This service use different technologies to provide an authentification but mainly:
+This service use different technologies mainly:
+- **Node.js** and **Express**: The service is built using Node.js and the Express framework to handle HTTP requests and manage routes.
+- **CouchDB**: A NoSQL database used for storing order information. Views are created within CouchDB to facilitate queries related to user-specific orders.
 - **Gulp**: A javascript task runner to build the application.
 - **JWT**: A javascript library to generate and verify JSON Web Tokens, very userful for stateless applications, used in this case to check the role of the user (using the provided token).
 
@@ -207,7 +235,7 @@ make products-push
 
 ### API of the service
 
-The product service has five commands:
+The product service has five routes:
 
 - **GET /products**: Get all the products from the database. The service will return a json object with the following fields:
   - ***status***: The status of the request (success, error).
@@ -301,6 +329,8 @@ The logging of the logging service is to log the requests made by the other micr
 ### Associated technologies
 
 This service use different technologies to provide an authentification but mainly:
+- **Node.js** and **Express**: The service is built using Node.js and the Express framework to handle HTTP requests and manage routes.
+- **CouchDB**: A NoSQL database used for storing order information. Views are created within CouchDB to facilitate queries related to user-specific orders.
 - **Gulp**: A javascript task runner to build the application.
 - **JWT**: A javascript library to generate and verify JSON Web Tokens, very userful for stateless applications, used in this case to check the role of the user (using the provided token).
 
@@ -324,9 +354,9 @@ make logger-push
 
 ### API of the service
 
-The logging service has nine commands, but 3 main commands:
+The logging service has nine routes, but 3 main routes:
 
-:heavy_exclamation_mark: To be more concise, the two following commands will use the variable `:name_of_the_service` to refer to the name of the service that made the request. I.e ùser, products, orders, shopping-carts. According to the name of the service, the logger will log the request in the corresponding database.
+:heavy_exclamation_mark: To be more concise, the two following routes will use the variable `:name_of_the_service` to refer to the name of the service that made the request. I.e ùser, products, orders, shopping-carts. According to the name of the service, the logger will log the request in the corresponding database.
 
 - **POST /logger/:name_of_the_service/info**: Log an info message. The body of the request must be a json object with the following fields:
   - ***message***: The message to log.
