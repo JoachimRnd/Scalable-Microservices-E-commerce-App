@@ -51,30 +51,40 @@ function getWorkersIps {
   docker node ls | awk '{print $1, $2}' > tmp
   if [ $? -ne 0 ]; then
     echo "Failed to list docker nodes"
-    exit 1
+    return 1
   fi
   l=`wc -l tmp | awk '{print $1}'`
   let n=${l}-1
   if [ $n -lt 0 ]; then
     echo "No lines in tmp file"
-    exit 1
+    return 1
   fi
-  # file "nodes" contains all nodes in the swarm
   workers=""
   tail -n ${n} tmp > nodes
   for (( i = 1; i <= ${n}; i++ )); do
     id=`head -${i} nodes | tail -1 | awk '{print $1}'`
+    if [ $? -ne 0 ]; then
+      echo "Failed to get node id"
+      exit 1
+    fi
     role=`head -${i} nodes | tail -1 | awk '{print $2}'`
+    if [ $? -ne 0 ]; then
+      echo "Failed to get node role"
+      exit 1
+    fi
     if [ "${role}" != "*" ]; then
       workers="${id} ${workers}"
     fi
   done
-  # ${workers} is a string (sparated with spaces) with all workers IDs in a swarm
   for w in ${workers} ; do
     ip=`docker node inspect ${w} | grep Addr | awk '{print $2}'`
+    if [ $? -ne 0 ]; then
+      echo "Failed to get worker IP"
+      exit 1
+    fi
     WORKERS_IPS="${ip} ${WORKERS_IPS}"
+    echo "Worker ${w} has IP ${ip}"
   done
-  # ${WORKERS_IPS} is a string (sparated with spaces) with all workers IP addresses in a swarm
   rm -f tmp nodes
 }
 
@@ -85,7 +95,22 @@ function getWorkersIps {
 docker node ls &> /dev/null
 [ ${?} != 0 ] && endScript "notManager"
 
-getWorkersIps
+# Disable exit on error
+set +e
+
+# Retry the getWorkersIps function until it fails
+while true; do
+  echo "Trying to get workers IPs..."
+  getWorkersIps
+  if [ $? -eq 0 ]; then
+    echo "getWorkersIps succeeded"
+    break 
+  fi
+  sleep 1
+done
+
+# Re-enable exit on error
+set -e
 
 AVG="0.0"
 #service="${stack}_${2}"
@@ -95,34 +120,43 @@ AVG="0.0"
 #-------------------------------------------------------------------------------
 function updateAvg {
   local service="$1"
+  # echo "Service : ${service}"
   sum=""
   REPLICAS=0
+  set +e
   id=`docker ps | grep ${service}`
+  # echo "id = ${id}"
+  set -e
   if [ "${id}" != "" ] ; then
     id=`echo ${id} | awk '{print $1}'`
+    # echo "id = ${id}"
     data=`docker stats --no-stream ${id}`
+    # echo "data = ${data}"
     sum=`echo ${data} | awk '{print $19}' | awk -F '%' '{print $1}'`
     let REPLICAS=REPLICAS+1
   fi
+  # echo "REPLICAS = ${REPLICAS}"
   for ip in ${WORKERS_IPS} ; do
     ip=`echo ${ip} | awk -F '"' '{print $2}'`
-    id=`ssh ${ip} "docker ps" | grep ${service}`
+    set +e
+    id=`yes | ssh ${ip} "docker ps" | grep ${service}`
+    set -e
     if [ "${id}" != "" ] ; then
       id=`echo ${id} | awk '{print $1}'`
-      data=`ssh ${ip} "docker stats --no-stream ${id}"`
+      data=`yes | ssh ${ip} "docker stats --no-stream ${id}"`
       data=`echo ${data} | awk '{print $19}' | awk -F '%' '{print $1}'`
       sum="${data}, ${sum}"
       let REPLICAS=REPLICAS+1
     fi
   done
-  #echo "Get avg with [${sum}]"
+  # echo "Get avg with [${sum}]"
   ok=`python -c "l = [${sum}] ;r = 1 if len(l) != 0 else 0 ;print(r) "`
   if [ ${ok} -eq 1 ]; then
     AVG=`python -c "l = [${sum}] ;print( sum(l) / len(l) ) "`
   else
     AVG="0.0"
   fi
-  #echo "AVG = ${AVG}"
+  # echo "updated AVG = ${AVG}"
 }
 
 TRESHOLD="80.0"
@@ -142,14 +176,16 @@ WORKERS=1
 while true; do
   while [ "$(tresholdNotReached)" == "1" ]; do
     updateAvg "${SERVICE}"
-    ((PATIENCE++))
-    #echo "Service : ${SERVICE}"
+    echo "AVG = ${AVG}"
+    let PATIENCE=PATIENCE+1
+    # echo "Service : ${SERVICE}"
     if [ ${PATIENCE} -ge ${PATIENCE_COUNT} ] && [ ${WORKERS} -gt 1 ]; then
       let "WORKERS=WORKERS/3"
       echo "Reducing for service ${SERVICE} to ${WORKERS} replicas."
       docker service scale ${SERVICE}=${WORKERS}
       PATIENCE=0
     fi
+    echo "Sleeping 5 seconds..."
     sleep 5
   done
   PATIENCE=0
