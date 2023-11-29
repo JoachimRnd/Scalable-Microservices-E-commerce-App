@@ -6,7 +6,6 @@ const createProduct = (product) => {
       product,
       (error, success) => {
         if (success) {
-          console.log("Product successfully created");
           const productWIthId = { ...product, _id: success.id, _rev: success.rev };
           resolve({product : productWIthId});
         } else {
@@ -23,7 +22,6 @@ const updateProduct = (product) => {
       product,
       (error, success) => {
         if (success) {
-          console.log("Product successfully updated");
           resolve({product : product});
         } else {
           reject(new Error(`Error updating an product. Reason: ${error.reason}.`));
@@ -40,7 +38,6 @@ const deleteProduct = (product) => {
       product._rev,
       (error, success) => {
         if (success) {
-          console.log("Product successfully deleted");
           resolve({product : product});
         } else {
           reject(new Error(`Error deleting an product. Reason: ${error.reason}.`));

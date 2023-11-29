@@ -4,7 +4,6 @@ const tokenUtils = require('../utils/tokenUtils');
 
 function authMiddleware(req, res, next) {
     const authHeader = req.headers.authorization;
-    console.log("authHeader", authHeader)
 
     if (!authHeader) {
         log('Token not provided');

@@ -84,7 +84,6 @@ function createCart() {
 				cart.update((old) => []);
 			}
 		} catch (error) {
-			console.log("TEST DANS GET CART")
 			cart.update((old) => []);
 			handleError(error, 'get Cart');
 		}

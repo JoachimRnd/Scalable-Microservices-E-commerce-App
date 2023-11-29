@@ -16,7 +16,6 @@ const computeTimeDifference = (req) => {
 const info = (message, data, req) => {
     return new Promise((resolve, reject) => {
         const timeDifference = computeTimeDifference(req);
-        console.log('Time difference in milliseconds: ', timeDifference);
         logger.post(`${gateway}/logger/orders/info`, { message, data, startTime: req._startTime, request_time_ms : timeDifference})
             .then((success) => {
                 resolve(success);
@@ -30,7 +29,6 @@ const info = (message, data, req) => {
 const error = (message, data, req) => {
     return new Promise((resolve, reject) => {
         const timeDifference = computeTimeDifference(req);
-        console.log('Time difference in milliseconds: ', timeDifference);
         logger.post(`${gateway}/logger/orders/error`, { message, data, startTime: req._startTime, request_time_ms : timeDifference })
             .then((success) => {
                 resolve(success);

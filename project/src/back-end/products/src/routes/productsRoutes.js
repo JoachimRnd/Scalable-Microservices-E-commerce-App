@@ -12,7 +12,6 @@ module.exports = (productsCrud) => {
     const product = req.body.product;
     const userId = req.userId;
 
-    console.log('Creating new product');
     productsCrud.createProduct(product)
     .then((successMessage) => {
       loggerCrud.info('Product created', { product, userId }, req)
