@@ -56,7 +56,7 @@ This service use different technologies to provide the user interface:
 - **Nodejs**: A javascript runtime environment.
 - **Docker**: A containerization platform to build and run the application in a 
   consistent environment across different platforms.
-
+- **CouchDB**: A NoSQL database used for storing information.
 
 ### How to build the container
 
@@ -157,8 +157,6 @@ The Order service is responsible for managing orders within the application. It 
 
 ### Associated technologies
 
-- **Node.js** and **Express**: The service is built using Node.js and the Express framework to handle HTTP requests and manage routes.
-- **CouchDB**: A NoSQL database used for storing order information. Views are created within CouchDB to facilitate queries related to user-specific orders.
 - **Gulp**: A javascript task runner to build the application.
 - **JWT**: A javascript library to generate and verify JSON Web Tokens, very userful for stateless applications, used in this case to check the role of the user (using the provided token).
 
@@ -232,8 +230,6 @@ The product service is used to manage the products of the application. It is com
 ### Associated technologies
 
 This service use different technologies mainly:
-- **Node.js** and **Express**: The service is built using Node.js and the Express framework to handle HTTP requests and manage routes.
-- **CouchDB**: A NoSQL database used for storing order information. Views are created within CouchDB to facilitate queries related to user-specific orders.
 - **Gulp**: A javascript task runner to build the application.
 - **JWT**: A javascript library to generate and verify JSON Web Tokens, very userful for stateless applications, used in this case to check the role of the user (using the provided token).
 
@@ -352,8 +348,6 @@ The logging of the logging service is to log the requests made by the other micr
 ### Associated technologies
 
 This service use different technologies to provide an authentification but mainly:
-- **Node.js** and **Express**: The service is built using Node.js and the Express framework to handle HTTP requests and manage routes.
-- **CouchDB**: A NoSQL database used for storing order information. Views are created within CouchDB to facilitate queries related to user-specific orders.
 - **Gulp**: A javascript task runner to build the application.
 - **JWT**: A javascript library to generate and verify JSON Web Tokens, very userful for stateless applications, used in this case to check the role of the user (using the provided token).
 
