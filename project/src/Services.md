@@ -56,7 +56,7 @@ This service use different technologies to provide the user interface:
 - **Nodejs**: A javascript runtime environment.
 - **Docker**: A containerization platform to build and run the application in a 
   consistent environment across different platforms.
-
+- **CouchDB**: A NoSQL database used for storing information.
 
 ### How to build the container
 
@@ -153,11 +153,58 @@ In case of error, the service will return a json object with the following field
 
 ### Role of the service
 
+The Order service is responsible for managing orders within the application. It provides a REST API for creating and retrieving orders, and it interacts with a database to store order information. The service ensures that orders are associated with the correct user by utilizing an authentication middleware.
+
 ### Associated technologies
+
+- **Gulp**: A javascript task runner to build the application.
+- **JWT**: A javascript library to generate and verify JSON Web Tokens, very userful for stateless applications, used in this case to check the role of the user (using the provided token).
 
 ### How to build the container
 
+To build the container for the order service, run the following command in
+the project directory:
+
+```bash
+# Build and push the entire Order service to Docker Hub
+make orders
+
+# Build only the Order service container
+make orders-build
+
+# Push only the Order service container to Docker Hub
+make orders-push
+```
+
 ### API of the service
+
+The Order service exposes two routes:
+
+- **POST /order/checkout**: Create a new order in the database for the authenticated user. The body of the request must be a json object with the following fields:
+  - ***items***: An array of json objects containing the orders. Each item has the following fields:
+    - ***id***: The id of the product item to checkout.
+    - ***quantity***: The quantity of the item to checkout.
+  - ***extras***: A json object containing the extras information about the order.
+    - ***totalQuantity***: The total quantity of the order.
+    - ***totalPrice***: The total price of the order.
+    - ***date***: The date of the order.
+
+- **GET /order/user/orders**: Retrieves all orders associated with the authenticated user. The service returns a JSON object with the following fields:
+  - ***status***: The status of the request (success, error).
+  - ***_id***: The id of the order given by the `CouchDB`.
+  - ***_rev***: The revision of the order given by the `CouchDB`.
+  - ***userId***: The id of the user who did the checkout.
+  - ***items***: An array of json objects containing the orders. Each order has the following fields:
+    - ***id***: The id of the product item.
+    - ***quantity***: The quantity of the item. 
+  - ***extras***: A json object containing the extras information about the order.
+    - ***totalQuantity***: The total quantity of items in the order.
+    - ***totalPrice***: The total price of the order.
+    - ***date***: The date of the order.
+
+In case of error, the service will return a json object with the following fields:
+- ***message***: The error message.
+- ***status***: The status of the request (success, error).
 
 <!--  -->
 
@@ -165,11 +212,56 @@ In case of error, the service will return a json object with the following field
 
 ### Role of the service
 
+The Shopping cart service is responsible for managing the cart of each user within the application. It provides a REST API for creating, deleting and retrieving cart, and it interacts with a database to store the information. The service ensures that each cart are associated with the correct user by utilizing an authentication middleware and by storing the cart with the id of the user.
+
 ### Associated technologies
+
+- **Gulp**: A javascript task runner to build the application.
+- **JWT**: A javascript library to generate and verify JSON Web Tokens, very userful for stateless applications, used in this case to check the role of the user (using the provided token).
 
 ### How to build the container
 
+To build the container for the shopping cart service, run the following command in
+the project directory:
+
+```bash
+# Build and push the entire Shopping cart service to Docker Hub
+make shopping-carts
+
+# Build only the Shopping cart service container
+make shopping-carts-build
+
+# Push only the Shopping cart service container to Docker Hub
+make shopping-carts-push
+```
+
 ### API of the service
+
+The Shopping cart service exposes four routes:
+
+- **POST /cart**: Create a new cart in the database for the authenticated user. The body of the request must be a json object with the following fields:
+  - ***items***: An array of json objects containing the items to add to the cart. Each item has the following fields:
+    - ***id***: The id of the product item.
+    - ***quantity***: The quantity of the item added to the cart.
+
+- **GET /cart**: Retrieves the cart associated with the authenticated user. The service returns a JSON object with the following fields:
+  - ***status***: The status of the request (success, error).
+  - ***_id***: The id of the cart given by the `CouchDB` which is equal to the userId.
+  - ***_rev***: The revision of the cart given by the `CouchDB`.
+  - ***items***: An array of json objects containing the items in the cart. Each product item has the following fields:
+    - ***id***: The id of the product item.
+    - ***quantity***: The quantity of the item added to the cart.
+
+- **DELETE /cart**: Delete the entire cart of a user in the database.
+  - The **userId** is retrieved from the token 
+
+- **DELETE /cart/:itemId**: Delete a specific item by id in the cart of a user in the database. 
+  - The **userId** is retrieved from the token
+  - **ItemId** is retrieved from the params
+
+In case of error, the service will return a json object with the following fields:
+- ***message***: The error message.
+- ***status***: The status of the request (success, error).
 
 
 <!--  -->
@@ -182,7 +274,7 @@ The product service is used to manage the products of the application. It is com
 
 ### Associated technologies
 
-This service use different technologies to provide an authentification but mainly:
+This service use different technologies mainly:
 - **Gulp**: A javascript task runner to build the application.
 - **JWT**: A javascript library to generate and verify JSON Web Tokens, very userful for stateless applications, used in this case to check the role of the user (using the provided token).
 
@@ -207,7 +299,7 @@ make products-push
 
 ### API of the service
 
-The product service has five commands:
+The product service has five routes:
 
 - **GET /products**: Get all the products from the database. The service will return a json object with the following fields:
   - ***status***: The status of the request (success, error).
@@ -219,8 +311,8 @@ The product service has five commands:
     - ***image***: The image of the product as URL.
     - ***category***: The category of the product.
 
-- **POST /products/ids**: Get all the products from the database with the given ids. The body of the request must be a json object with the following fields:
-  - ***ids***: An array of ids of the products to get from the database.
+- **GET /products/id**: Get all the products from the database with the given ids.
+  - ***productsId***: The id of the products to get from the database.
   
   The service will return a json object with the following fields:
   - ***status***: The status of the request (success, error).
@@ -324,9 +416,9 @@ make logger-push
 
 ### API of the service
 
-The logging service has nine commands, but 3 main commands:
+The logging service has nine routes, but 3 main routes:
 
-:heavy_exclamation_mark: To be more concise, the two following commands will use the variable `:name_of_the_service` to refer to the name of the service that made the request. I.e ùser, products, orders, shopping-carts. According to the name of the service, the logger will log the request in the corresponding database.
+:heavy_exclamation_mark: To be more concise, the two following routes will use the variable `:name_of_the_service` to refer to the name of the service that made the request. I.e ùser, products, orders, shopping-carts. According to the name of the service, the logger will log the request in the corresponding database.
 
 - **POST /logger/:name_of_the_service/info**: Log an info message. The body of the request must be a json object with the following fields:
   - ***message***: The message to log.
