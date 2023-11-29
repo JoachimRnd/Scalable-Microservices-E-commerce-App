@@ -40,6 +40,8 @@ curl --request PUT \
     }
   }'
 
+
+
 echo "Wait (indefenitly) until the DB creation (name: orders-d-logs)."
 echo "The DB URL is: ${DB_URL}"
 until curl --request PUT ${DB_URL}/orders-d-logs ; do
@@ -57,6 +59,7 @@ curl --request PUT \
       }
     }
   }'
+
 
 echo "Wait (indefenitly) until the DB creation (name: carts-d-logs)."
 echo "The DB URL is: ${DB_URL}"
@@ -77,6 +80,7 @@ curl --request PUT \
   }'
 
 
+
 echo "Wait (indefenitly) until the DB creation (name: products-d-logs)."
 echo "The DB URL is: ${DB_URL}"
 until curl --request PUT ${DB_URL}/products-d-logs ; do
@@ -94,6 +98,7 @@ curl --request PUT \
       }
     }
   }'
+
 
 echo "Start users service..."
 npm start

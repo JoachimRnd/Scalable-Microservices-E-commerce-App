@@ -23,6 +23,7 @@
 export DB_URL="http://${ADMIN_NAME}:${ADMIN_PASSW}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
 
 if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
+
   echo "Wait (indefenitly) until the DB creation (name: ${DB_NAME})."
   echo "The DB URL is: ${DB_URL}"
   until curl --request PUT ${DB_URL} ; do
@@ -32,16 +33,17 @@ if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
   echo "Inserting views into the database..."
 
   curl --request PUT \
-     --url ${DB_URL}/_design/orders \
-     --header 'Content-Type: application/json' \
-     --data '{
-       "views": {
-         "byUserId": {
-           "map": "function (doc) { if (doc.userId) { emit(doc.userId, doc); }}"
-         }
-       }
-     }'
+    --url ${DB_URL}/_design/orders \
+    --header 'Content-Type: application/json' \
+    --data '{
+      "views": {
+        "byUserId": {
+          "map": "function (doc) { if (doc.userId) { emit(doc.userId, doc); }}"
+        }
+      }
+    }'
   echo "DB (${DB_NAME}) was created!"
+
 fi
 echo "Start users service..."
 npm start

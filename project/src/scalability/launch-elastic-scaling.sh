@@ -4,9 +4,9 @@ SERVICES=("scapp_users-daemon" "scapp_orders-daemon" "scapp_shopping-carts-daemo
 
 for service in "${SERVICES[@]}"; do
   (
-    ./src/scalability/elastic-scaling.sh "${service}" &
+    ./src/scalability/elastic-scaling.sh "${service}"> "logs/${service}.log" 2>&1 &
     pid=$!
-    echo "${pid}" > "${service}_pid.txt"
+    echo "${pid}" > "pids/${service}_pid.txt"
   )
 done
 

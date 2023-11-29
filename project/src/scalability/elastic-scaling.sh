@@ -49,11 +49,19 @@ WORKERS_IPS=""
 function getWorkersIps {
   rm -f tmp nodes
   docker node ls | awk '{print $1, $2}' > tmp
+  if [ $? -ne 0 ]; then
+    echo "Failed to list docker nodes"
+    exit 1
+  fi
   l=`wc -l tmp | awk '{print $1}'`
   let n=${l}-1
+  if [ $n -lt 0 ]; then
+    echo "No lines in tmp file"
+    exit 1
+  fi
   # file "nodes" contains all nodes in the swarm
   workers=""
-  tail -${n} tmp > nodes
+  tail -n ${n} tmp > nodes
   for (( i = 1; i <= ${n}; i++ )); do
     id=`head -${i} nodes | tail -1 | awk '{print $1}'`
     role=`head -${i} nodes | tail -1 | awk '{print $2}'`
