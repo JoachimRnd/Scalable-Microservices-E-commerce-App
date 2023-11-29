@@ -45,6 +45,7 @@ function createCart() {
 			if (!localUser) return;
 
 			const token = JSON.parse(localUser).token;
+
 			const config = {
 				headers: { Authorization: `Bearer ${token}` },
 			};
@@ -54,12 +55,11 @@ function createCart() {
 				const productIds = response.data.cart.flatMap((item) => item._id);
 
 				if (productIds.length > 0) {
-					const productsDetailsResponse = await axios.post(
-						`${url}/products/ids`,
-						{ productIds },
+					const productsDetailsResponse = await axios.get(
+						`${url}/products/id?productsId=${productIds.join(",")}`,
 						config
 					);
-
+					if(productsDetailsResponse.data.error) throw new Error(productsDetailsResponse.data.error);
 					const productsDetails = productsDetailsResponse.data.data;
 
 					const updatedCart = response.data.cart.map((item) => {
@@ -84,6 +84,8 @@ function createCart() {
 				cart.update((old) => []);
 			}
 		} catch (error) {
+			console.log("TEST DANS GET CART")
+			cart.update((old) => []);
 			handleError(error, 'get Cart');
 		}
 	};

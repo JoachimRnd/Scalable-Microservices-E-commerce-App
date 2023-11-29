@@ -77,9 +77,9 @@ const getProducts = () => {
   });
 }
 
-const getProductsByIds = (productIds) => {
+const getProductsById = (productIds) => {
   return new Promise((resolve, reject) => {
-    products.view('products', 'getProductsByIds', { keys: productIds, include_docs: true }, (err, body) => {
+    products.view('products', 'getProductsById', { keys: productIds, include_docs: true }, (err, body) => {
       if (err) {
         reject(new Error(`Error getting products by IDs. Reason: ${err.reason}.`));
       } else {
@@ -97,7 +97,7 @@ module.exports = {
   createProduct,
   getProductsByCategory,
   getProducts,
-  getProductsByIds,
+  getProductsById,
   updateProduct,
   deleteProduct,
 };

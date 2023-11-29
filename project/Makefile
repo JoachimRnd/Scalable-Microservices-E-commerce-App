@@ -99,7 +99,6 @@ launch-elastic-scaling:
 	@echo -e "${GREEN}Launching elastic scaling${NC}"
 	@./src/scalability/launch-elastic-scaling.sh
 
- 
 stop-elastic-scaling:
 	@echo -e "${GREEN}Stopping elastic scaling${NC}"
 	@./src/scalability/stop-elastic-scaling.sh
