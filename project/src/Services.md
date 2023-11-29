@@ -86,6 +86,7 @@ make auth-push
 
 The authentification service has two commands:
 - **POST /user**: Create a new user in the database. The body of the request must be a json object with the following fields:
+  - ***status***: The status of the request (success, error). 
   - ***username***: The username of the user.
   - ***password***: The password of the user.
 
@@ -93,6 +94,13 @@ The authentification service has two commands:
   - ***token***: The token for this user valid for 14 days.  
 
 - **GET /user/:username/:password**: If the username and password are correct, the service will return a json object with the following fields:
+  - ***status***: The status of the request (success, error).
+  - ***data***:  
+    - ***token***: The token for this user valid for 14 days.
+    - ***role***: The role of the user (admin, user).
+
+In case of error, the service will return a json object with the following fields:
+- ***message***: The error message.
   
 <!--  -->
 
