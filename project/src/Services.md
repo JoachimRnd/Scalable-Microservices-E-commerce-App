@@ -180,6 +180,29 @@ make orders-push
 
 ### API of the service
 
+The Order service exposes two routes:
+
+- **POST /checkout**: Create a new order in the database for the authenticated user. The body of the request must be a json object with the following fields:
+  - ***items***: An array of json objects containing the orders. Each item has the following fields:
+    - ***id***: The id of the order.
+    - ***quantity***: The quantity of the item to checkout.
+  - ***extras***: A json object containing the extras information about the order.
+    - ***totalQuantity***: The total quantity of the order.
+    - ***totalPrice***: The total price of the order.
+    - ***date***: The date of the order.
+
+- **GET /user/orders**: Retrieves all orders associated with the authenticated user. The service returns a JSON object with the following fields:
+  - ***status***: The status of the request (success, error).
+  - ***_id***: The id of the order given by the `CouchDB`.
+  - ***_rev***: The revision of the order given by the `CouchDB`.
+  - ***userId***: The id of the user who did the checkout.
+  - ***items***: An array of json objects containing the orders. Each order has the following fields:
+    - ***id***: The id of the order.
+    - ***quantity***: The quantity of the item. 
+  - ***extras***: A json object containing the extras information about the order.
+    - ***totalQuantity***: The total quantity of items in the order.
+    - ***totalPrice***: The total price of the order.
+    - ***date***: The date of the order.
 
 In case of error, the service will return a json object with the following fields:
 - ***message***: The error message.
@@ -247,8 +270,8 @@ The product service has five routes:
     - ***image***: The image of the product as URL.
     - ***category***: The category of the product.
 
-- **POST /products/ids**: Get all the products from the database with the given ids. The body of the request must be a json object with the following fields:
-  - ***ids***: An array of ids of the products to get from the database.
+- **GET /products/id**: Get all the products from the database with the given ids.
+  - ***productsId***: The id of the products to get from the database.
   
   The service will return a json object with the following fields:
   - ***status***: The status of the request (success, error).
