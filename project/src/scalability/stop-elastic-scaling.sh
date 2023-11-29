@@ -10,6 +10,6 @@ for service in "${SERVICES[@]}"; do
     rm "pids/${service}_pid.txt"
     rm "logs/${service}.log"
   else
-    echo "No PID file found for service ${service}"
+    echo "Elastic scaling : No PID file found for service ${service}"
   fi
 done

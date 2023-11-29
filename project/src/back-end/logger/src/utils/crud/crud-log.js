@@ -1,4 +1,3 @@
-const e = require("express");
 
 const info = (body, logs) => {
     return new Promise((resolve, reject) => {
@@ -41,18 +40,14 @@ const error = (body, logs) => {
     });
 };
 
-const getUserInfo = (username, logs) => {
-    console.log('username', username);
+const getUserInfo = (userId, logs) => {
     return new Promise((resolve, reject) => {
-        logs.view('logs', 'getLogsByUserId', { keys: [username], include_docs: true }, (error, success) => {
-            if (success) {
-                console.log('success', success);
-                const data = success.rows.map(row => row.doc);
-                console.log('data', data);
+        logs.view('logs', 'getLogsByUserId', { key: userId, include_docs: true }, (err, body) => {
+            if (!err) {
+                const data = body.rows.map(row => row.doc);
                 resolve(data);
             } else {
-                console.log('error', error);
-                reject(error);
+                reject(new Error(`Error getting logs by user ID. Reason: ${err.reason}.`));
             }
         });
     });

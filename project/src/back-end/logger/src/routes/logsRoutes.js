@@ -11,24 +11,27 @@ const logsProducts = require('nano')(`${process.env.DB_URL}/products-d-logs`);
 
 
 module.exports = () => {
-  
-  router.get('/user/info/:username', authMiddleware, (req, res) => {
+
+  router.get('/user/info/:username', authMiddleware, async (req, res) => {
     const usrName = req.params.username;
     let result = {};
-    loggerCrud.getUserInfo(usrName, logsOrders)
-      .then((data) => result = { ...result, orders: data })
-      .catch((err) => res.status(409).json({ status: 'error', message: String(err) }));
-    console.log("result", result);  
-    loggerCrud.getUserInfo(usrName, logsCarts)
-      .then((data) => result = { ...result, carts: data })
-      .catch((err) => res.status(409).json({ status: 'error', message: String(err) }));
 
-    loggerCrud.getUserInfo(usrName, logsProducts)
-      .then((data) => result = { ...result, products: data })
-      .catch((err) => res.status(409).json({ status: 'error', message: String(err) }));
+    try {
+        result.orders = await loggerCrud.getUserInfo(usrName, logsOrders);
 
-    res.status(200).json({ status: 'success', data: result });
+        result.carts = await loggerCrud.getUserInfo(usrName, logsCarts);
+
+        result.products = await loggerCrud.getUserInfo(usrName, logsProducts);
+
+        res.status(200).json({ status: 'success', data: result });
+    } catch (err) {
+      console.log('error', err);
+        res.status(409).json({ status: 'error', message: String(err) });
+    }
   });
+
+
+
 
   router.post('/user/info', (req, res) => {
     loggerCrud.info(req.body, logsUser)

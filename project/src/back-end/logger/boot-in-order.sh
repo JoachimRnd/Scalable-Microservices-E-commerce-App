@@ -30,12 +30,12 @@ until curl --request PUT ${DB_URL}/users-d-logs ; do
 done
 echo "DB (users-d-logs) was created!"
 curl --request PUT \
-  --url ${DB_URL}/products-d-logs/_design/logs \
+  --url ${DB_URL}/users-d-logs/_design/logs \
   --header 'Content-Type: application/json' \
   --data '{
     "views": {
       "getLogsByUserId": {
-        "map": "function (doc) { if (doc.userId) { emit(doc._id, doc); } }"
+        "map": "function (doc) { if (doc.userId) { emit(doc.userId, doc); } }"
       }
     }
   }'
@@ -55,7 +55,7 @@ curl --request PUT \
   --data '{
     "views": {
       "getLogsByUserId": {
-        "map": "function (doc) { if (doc.userId) { emit(doc._id, doc); } }"
+        "map": "function (doc) { if (doc.userId) { emit(doc.userId, doc); } }"
       }
     }
   }'
@@ -74,7 +74,7 @@ curl --request PUT \
   --data '{
     "views": {
       "getLogsByUserId": {
-        "map": "function (doc) { if (doc.userId) { emit(doc._id, doc); } }"
+        "map": "function (doc) { if (doc.userId) { emit(doc.userId, doc); } }"
       }
     }
   }'
@@ -94,7 +94,7 @@ curl --request PUT \
   --data '{
     "views": {
       "getLogsByUserId": {
-        "map": "function (doc) { if (doc.userId) { emit(doc._id, doc); } }"
+        "map": "function (doc) { if (doc.userId) { emit(doc.userId, doc); } }"
       }
     }
   }'

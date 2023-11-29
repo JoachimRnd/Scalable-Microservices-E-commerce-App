@@ -120,7 +120,7 @@ swarm-deploy:
 	@echo "${GREEN}Deploying stack to swarm...${NC}"
 	@docker stack deploy --resolve-image always -c src/scapp.yml scapp
 
-swarm-deploy-with-scaling: swarm-deploy launch-elastic-scaling
+swarm-deploy-with-scaling: swarm-deploy stop-elastic-scaling launch-elastic-scaling
 
 swarm-remove: stop-elastic-scaling
 	@echo -e "${GREEN}Removing stack from swarm...${NC}"
@@ -140,7 +140,7 @@ swarm-init:
 	@docker network create --driver overlay --attachable scapp-net
 
 reload: full swarm-reload
-	@echo -e "${GREEN}Reloading stack...${NC}"
+	@echo -e "${GREEN}Stack reloaded...${NC}"
 
 
 #################
@@ -171,3 +171,4 @@ pull:
 	@docker pull ${DOCKER_ID}/scapp-shopping-carts
 	@docker pull ${DOCKER_ID}/scapp-products
 	@docker pull ${DOCKER_ID}/scapp-gateway
+	@docker pull ${DOCKER_ID}/scapp-logger
