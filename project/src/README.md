@@ -33,6 +33,15 @@ For more information about the services and how to build them, please refer to t
 
 ## The Swarm
 
+### Creating the swarm
+
+To initiate the swarm, run the following command:
+
+```bash
+# Deploying the swarm without scaling
+make swarm-init
+```
+
 ### Running the swarm
 
 To run the swarm, run the following command:
@@ -56,6 +65,15 @@ To stop the swarm, run the following command:
 ```bash
 # Stopping the swarm and the scaling services (if any)
 make swarm-remove
+```
+
+### Leaving the swarm
+
+To leave the swarm, run the following command:
+
+```bash
+# Leaving the swarm
+make swarm-leave
 ```
 
 
