@@ -12,7 +12,6 @@ module.exports = (productsCrud) => {
     const product = req.body.product;
     const userId = req.userId;
 
-    console.log('Creating new product');
     productsCrud.createProduct(product)
     .then((successMessage) => {
       loggerCrud.info('Product created', { product, userId }, req)
@@ -92,24 +91,29 @@ module.exports = (productsCrud) => {
       });
   });
 
-  router.post('/ids', (req, res) => {
-    const productIds = req.body.productIds;
-    productsCrud.getProductsByIds(productIds)
+  router.get('/id', (req, res) => {
+    const productsId = req.query.productsId; 
+    console.log("productsId",productsId)
+    const productsIdArray = productsId.split(',').map(id => id.trim());
+    console.log("productsIdArray",productsIdArray)
+
+    productsCrud.getProductsById(productsIdArray)
       .then((products) => {
         loggerCrud.info('Products sent', { userId: 'anonymous', products }, req)
           .catch((err) => {
             console.log('error', err);
         });
-        return res.status(200).json({ status: 'success', data: products })
+        return res.status(200).json({ status: 'success', data: products });
       })
       .catch((err) => {
         loggerCrud.error('Error while sending products', { userId: 'anonymous', error: err }, req)
           .catch((err) => {
             console.log('error', err);
         });
-        return res.status(500).json({ status: 'error', message: String(err) })
+        return res.status(500).json({ status: 'error', message: String(err) });
       });
   });
+  
 
   return router;
 };

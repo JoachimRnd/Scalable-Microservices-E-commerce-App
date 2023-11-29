@@ -1,7 +1,6 @@
 const logger = require('axios')
 
 const gateway = `http://${process.env.GATEWAY_HOST}`
-console.log('gateway', gateway);
 
 if (!process.env.GATEWAY_HOST) {
     throw new Error('GATEWAY_HOST is not set');
@@ -17,7 +16,6 @@ const computeTimeDifference = (req) => {
 const info = (message, data, req) => {
     return new Promise((resolve, reject) => {
         const timeDifference = computeTimeDifference(req);
-        console.log('Time difference in milliseconds: ', timeDifference);
         logger.post(`${gateway}/logger/carts/info`, { message, data, startTime: req._startTime, request_time_ms : timeDifference})
             .then((success) => {
                 resolve(success);
@@ -31,7 +29,6 @@ const info = (message, data, req) => {
 const error = (message, data, req) => {
     return new Promise((resolve, reject) => {
         const timeDifference = computeTimeDifference(req);
-        console.log('Time difference in milliseconds: ', timeDifference);
         logger.post(`${gateway}/logger/carts/error`, { message, data,startTime: req._startTime, request_time_ms : timeDifference })
             .then((success) => {
                 resolve(success);

@@ -27,17 +27,14 @@
 			);
 
 			if (productIds.length > 0) {
-				const productsDetailsResponse = await axios.post(
-					`${url}/products/ids`,
-					{ productIds },
+				const productsDetailsResponse = await axios.get(
+					`${url}/products/id?productsId=${productIds.join(",")}`,
 					{
 						headers: { Authorization: `Bearer ${token}` },
 					},
 				);
 
 				const productsDetails = productsDetailsResponse.data.data;
-
-	
 
 				prevCheckout = orders.map((order) => ({
 					...order,
@@ -57,8 +54,6 @@
 							  };
 					}),
 				}));
-
-				
 			} else {
 				prevCheckout = [];
 			}

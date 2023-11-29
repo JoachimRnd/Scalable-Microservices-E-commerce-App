@@ -1,7 +1,6 @@
 
 const info = (body, logs) => {
     return new Promise((resolve, reject) => {
-        console.log('body', body);
         let userId = '';
         if (!body.data.userId) {
             userId = 'unknown';
@@ -10,10 +9,8 @@ const info = (body, logs) => {
         }
         logs.insert({ level: 'info', message: body.message, userId, timestamp: body.startTime, data: body.data, request_time_ms: body.request_time_ms }, (error, success) => {
             if (success) {
-                console.log('success', success);
                 resolve(success);
             } else {
-                console.log('error', error);
                 reject(error);
             }
         });
@@ -30,10 +27,8 @@ const error = (body, logs) => {
     return new Promise((resolve, reject) => {
         logs.insert({ level: 'error', message: body.message, userId ,timestamp: body.startTime, data: body.data, request_time_ms: body.request_time_ms}, (error, success) => {
             if (success) {
-                console.log('success', success);
                 resolve(success);
             } else {
-                console.log('error', error);
                 reject(error);
             }
         });

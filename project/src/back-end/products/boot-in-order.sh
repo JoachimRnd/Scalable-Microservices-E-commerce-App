@@ -47,7 +47,7 @@ if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
         "getProducts": {
           "map": "function (doc) { emit(doc._id, doc); }"
         },
-        "getProductsByIds": {
+        "getProductsById": {
           "map": "function (doc) { if (doc._id) { emit(doc._id, doc); } }"
         }
       }

@@ -42,8 +42,6 @@
 	}
 
 	function createProduct() {
-		console.log("Modal Product:");
-		console.log(modalProduct);
 		products.__addProduct(modalProduct);
 		modalProduct = null;
 		showCreateModal = false;

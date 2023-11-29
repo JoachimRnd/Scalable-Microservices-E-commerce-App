@@ -69,8 +69,6 @@ function createProducts() {
 				headers: { Authorization: `Bearer ${token}` },
 			};
 
-			console.log('product', product);
-
 			const bodyParameters = {
 				product: {
 					name: product.name,
@@ -79,13 +77,11 @@ function createProducts() {
 					category: product.category,
 				}
 			};
-			console.log('bodyParameters', bodyParameters);
 
 			const response = await axios.post(PRODUCT_URL, bodyParameters, config);
 			const finalProduct = response.data.message.product;
 
 			update((oldProducts) => {
-				console.log("Old products", oldProducts);
 				return addProductsLocal(oldProducts, finalProduct);
 			});
 		} catch (error) {
@@ -129,12 +125,8 @@ function createProducts() {
 				}
 			};
 
-			console.log('bodyParameters', bodyParameters);
-
 			const response = await axios.put(PRODUCT_URL, bodyParameters, config);
 			const finalProduct = response.data.message.product;
-
-			console.log('finalProduct', finalProduct);
 
 			update((oldProducts) => {
 				return updateProductLocal(oldProducts, finalProduct);
