@@ -195,7 +195,7 @@ The Order service exposes two routes:
   - ***_rev***: The revision of the order given by the `CouchDB`.
   - ***userId***: The id of the user who did the checkout.
   - ***items***: An array of json objects containing the orders. Each order has the following fields:
-    - ***id***: The id of the order.
+    - ***id***: The id of the product item.
     - ***quantity***: The quantity of the item. 
   - ***extras***: A json object containing the extras information about the order.
     - ***totalQuantity***: The total quantity of items in the order.
