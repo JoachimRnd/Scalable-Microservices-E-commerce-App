@@ -6,6 +6,8 @@ This project uses Docker containers and a Makefile to simplify the build process
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
+:heavy_exclamation_mark: **Note:** If you are using Windows the .sh files are written in LF and not CRLF. You can change the line endings in VSCode by clicking on the CRLF in the bottom right corner and selecting LF. 
+
 ### Prerequisites
 
 - Docker
