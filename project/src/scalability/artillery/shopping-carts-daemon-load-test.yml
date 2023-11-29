@@ -8,3 +8,5 @@ scenarios:
   - flow:
     - get:
         url: /cart
+        headers:
+          authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MDI0MTE0MzUsImlhdCI6MTcwMTIwMTgzNSwic3ViIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4ifQ.wWU8Xkm6lwfzJx9uLBhs2dDgNsyDFgT1hsKKzbjRIVM
