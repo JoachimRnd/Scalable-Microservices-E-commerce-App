@@ -15,6 +15,7 @@ ADD src src
 ADD boot-in-order.sh .
 ADD db-init.js .
 ADD db-init.json .
+ADD func_to_string.js .
 
 # we now use an script to deploy the authentication service
 CMD source boot-in-order.sh

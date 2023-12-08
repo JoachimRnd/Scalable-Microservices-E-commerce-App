@@ -37,21 +37,21 @@ if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
       sleep 2
     done
 
-    echo "Inserting views into the database..."
+    # echo "Inserting views into the database..."
 
-    curl --request PUT \
-    --url ${DB_URL}/_design/products \
-    --header 'Content-Type: application/json' \
-    --data '{
-      "views": {
-        "getProducts": {
-          "map": "function (doc) { emit(doc._id, doc); }"
-        },
-        "getProductsById": {
-          "map": "function (doc) { if (doc._id) { emit(doc._id, doc); } }"
-        }
-      }
-    }'
+    # curl --request PUT \
+    # --url ${DB_URL}/_design/products \
+    # --header 'Content-Type: application/json' \
+    # --data '{
+    #   "views": {
+    #     "getProducts": {
+    #       "map": "function (doc) { emit(doc._id, doc); }"
+    #     },
+    #     "getProductsById": {
+    #       "map": "function (doc) { if (doc._id) { emit(doc._id, doc); } }"
+    #     }
+    #   }
+    # }'
 
     echo "DB (${DB_NAME}) was created!"
 
@@ -61,6 +61,27 @@ if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
     echo "DB (${DB_NAME}) already exists!"
   fi 
 fi
+
+echo "Apply a formatter for each view"
+mkdir formatter_output
+DEBUG=views* node func_to_string.js
+if [[ ${?} != 0 ]]; then
+  echo -e "ERROR: during the creation of views\nEND OF ${0}"
+  exit 1
+fi
+echo -e "\tDONE"
+
+echo "Creation of views for products DB"
+for view in `ls ./formatter_output/*.js`; do
+  echo -e "\t${view}"
+  cat ${view} 
+  curl -X PUT "${DB_URL}/_design/products" --upload-file ${view}
+  if [[ ${?} != 0 ]]; then
+    echo -e "ERROR: during the creation of view ${view}\nEND OF ${0}"
+    exit 1
+  fi
+done
+echo -e "\tDONE"
 
 echo "Start users service..."
 npm start
