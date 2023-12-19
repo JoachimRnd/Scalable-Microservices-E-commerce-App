@@ -32,14 +32,6 @@ if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
   done
   echo "DB (${DB_NAME}) was created!"
 
-  echo "Creating admin user..."
-  curl --request PUT ${DB_URL}/admin \
-      -d '{
-          "_id": "admin",
-          "passw": "$2a$10$ZQMfyGXsTkYAvwSA.QcSS.Sob3TQlR2CaYmy86l15qzF9QTgm7oPy",
-          "role": "admin"
-      }'
-
 fi
-echo "Start users service..."
+echo "Start recommendations service..."
 npm start

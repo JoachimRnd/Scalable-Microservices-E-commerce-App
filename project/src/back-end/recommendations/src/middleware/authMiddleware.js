@@ -4,7 +4,6 @@ const tokenUtils = require('../utils/tokenUtils');
 
 function authMiddleware(req, res, next) {
     const authHeader = req.headers.authorization;
-
     if (!authHeader) {
         log('Token not provided');
         return res.status(401).json({ status: 'error', message: 'Unauthorized: Token not provided' });
@@ -19,17 +18,11 @@ function authMiddleware(req, res, next) {
 
     try {
         const decoded = tokenUtils.decodeToken(token);
-
         if (decoded.exp <= moment().unix()) {
             log('Expired token');
             return res.status(401).json({ status: 'error', message: 'Unauthorized: Expired token' });
         }
         req.userId = decoded.sub;
-
-        if (decoded.role !== 'admin') {
-            log('Unauthorized role');
-            return res.status(401).json({ status: 'error', message: 'Unauthorized: Unauthorized role' });
-        }
         next();
     } catch (err) {
         log('Failed to verify token');

@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const log = require('debug')('products-d');
-const authMiddleware = require('../middleware/authMiddleware');
+const adminMiddleware = require('../middleware/adminMiddleware');
 const tokenUtils = require('../utils/tokenUtils');
 
 
 const loggerCrud = require('../utils/crud/crud-logger');
 
 module.exports = (productsCrud) => {
-  router.post('/', authMiddleware, (req, res) => {
+  router.post('/', adminMiddleware, (req, res) => {
     const product = req.body.product;
     const userId = req.userId;
 
@@ -29,7 +29,7 @@ module.exports = (productsCrud) => {
     });
   });
 
-  router.put('/', authMiddleware, (req, res) => {
+  router.put('/', adminMiddleware, (req, res) => {
     console.log('Updating product');
     const product = req.body.product;
     const userId = req.userId;
@@ -51,7 +51,7 @@ module.exports = (productsCrud) => {
       });
   });
 
-  router.delete('/', authMiddleware, (req, res) => {
+  router.delete('/', adminMiddleware, (req, res) => {
     console.log('Deleting product');
     const product = req.body.product;
     const userId = req.userId;

@@ -1,6 +1,4 @@
 # Variables  
-
-# DOCKER_ID = "mxdx02"
                                                                                                                                                                                                               
 # Colors                                                                                                                                                                                                       
 RED=\033[0;31m                                                                                                                                                                                                 
@@ -15,8 +13,8 @@ NC=\033[0m
 full: full-build full-push                                                                                                                                                                                               
 full-build: frontend-build backend-build
 full-push: frontend-push backend-push   
-backend-build: storage-build orders-build auth-build shopping-carts-build products-build gateway-build logger-build
-backend-push: storage-push orders-push auth-push shopping-carts-push products-push gateway-push logger-push
+backend-build: storage-build orders-build auth-build shopping-carts-build products-build gateway-build logger-build recommendations-build
+backend-push: storage-push orders-push auth-push shopping-carts-push products-push gateway-push logger-push recommendations-push
 swarm-reload: swarm-remove swarm-deploy
 scaling-reload: stop-elastic-scaling launch-elastic-scaling
 swarm-reload-with-scaling: swarm-remove swarm-deploy-with-scaling
@@ -30,6 +28,7 @@ gateway: gateway-build gateway-push
 orders: orders-build orders-push
 products: products-build products-push
 shopping-carts: shopping-carts-build shopping-carts-push
+recommendations: recommendations-build recommendations-push
 logger: logger-build logger-push
 
 ###############                                                                                                                                                                                                               
@@ -82,6 +81,14 @@ products-build:
 products-push:
 	@docker tag scapp-products ${DOCKER_ID}/scapp-products
 	@docker push ${DOCKER_ID}/scapp-products
+
+recommendations-build:
+	@echo -e "${GREEN}Buidling recommendations docker image...${NC}"
+	@docker build -t scapp-recommendations src/back-end/recommendations
+
+recommendations-push:
+	@docker tag scapp-recommendations ${DOCKER_ID}/scapp-recommendations
+	@docker push ${DOCKER_ID}/scapp-recommendations
 
 gateway-build:
 	@echo -e "${GREEN}Buidling gateway docker image...${NC}"
@@ -160,6 +167,7 @@ elastic-scaling-shopping-carts-daemon-test: launch-elastic-scaling artillery-bui
 elastic-scaling-products-daemon-test: launch-elastic-scaling artillery-build
 	@echo -e "${GREEN}Running artillery test...${NC}"
 	@docker run -d --name products-load-test-$$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1) --network scapp-net scapp-artillery ./entrypoints-products.sh
+
 # Force pull from docker hub
 pull:
 	@echo -e "${GREEN}Pulling images from docker hub...${NC}"
@@ -169,5 +177,6 @@ pull:
 	@docker pull ${DOCKER_ID}/scapp-orders
 	@docker pull ${DOCKER_ID}/scapp-shopping-carts
 	@docker pull ${DOCKER_ID}/scapp-products
+	@docker pull ${DOCKER_ID}/scapp-recommendations
 	@docker pull ${DOCKER_ID}/scapp-gateway
 	@docker pull ${DOCKER_ID}/scapp-logger

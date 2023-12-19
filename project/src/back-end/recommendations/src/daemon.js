@@ -2,8 +2,8 @@ const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 const log = require('debug')('users-d');
-const userRoutes = require('./routes/userRoutes');
-const userCrud = require('./utils/crud/crud-user');
+const recommendationRoutes = require('./routes/recommendationRoutes');
+const recommendationCrud = require('./utils/crud/crud-recommendation');
 
 const server = express();
 
@@ -11,7 +11,7 @@ server.use(logger('dev'));
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: false }));
 
-server.use('/user', userRoutes(userCrud));
+server.use('/recommendation', recommendationRoutes(recommendationCrud));
 
 server.use((req, res, next) => {
   const err = new Error('Not Found');

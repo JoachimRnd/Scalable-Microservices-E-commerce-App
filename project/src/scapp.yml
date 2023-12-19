@@ -2,32 +2,10 @@ version: "3"
 services:     # list all services for your application
 
   ###########
-  # gateway #
-  ###########
-  gateway:
-    image: ${DOCKER_ID}/scapp-gateway:latest
-    ports: [ "80:80" ]
-    deploy:
-      # locate this service in the swarm manager
-      placement:
-        constraints:
-          - node.role == manager
-    networks: [ "scapp-net" ]
-    depends_on: 
-      - users-daemon
-      - orders-daemon
-      - shopping-carts-daemon
-      - products-daemon
-      - logger-daemon
-
-  ###########
   # Logging #
   ###########
   logger-daemon:
     image: ${DOCKER_ID}/scapp-logger:latest
-    # link both services (same effect of option --link in docker run)
-    depends_on: [ "logging-db" ]
-    # expose port number 3000 of host running this service
     ports: [ "3009:80" ]
     environment:
       - TOKEN_SECRET=AkbRocZI           # string to create tokens (see utils/en-de-coders.js)
@@ -78,9 +56,6 @@ services:     # list all services for your application
   # server that listens HTTP requests
   users-daemon:
     image: ${DOCKER_ID}/scapp-auth:latest
-    # link both services (same effect of option --link in docker run)
-    depends_on: [ "users-db" ]
-    # expose port number 3000 of host running this service
     ports: [ "3000:80" ]
     environment:
       - TOKEN_SECRET=AkbRocZI           # string to create tokens (see utils/en-de-coders.js)
@@ -119,9 +94,6 @@ services:     # list all services for your application
   # server that listens order HTTP requests
   orders-daemon:
     image: ${DOCKER_ID}/scapp-orders:latest
-    # link both services (same effect of option --link in docker run)
-    depends_on: [ "orders-db" ]
-    # expose port number 3004 of host running this service
     ports: [ "3004:80" ]
     environment:
       - TOKEN_SECRET=AkbRocZI           # string to create tokens (see utils/en-de-coders.js)
@@ -160,9 +132,6 @@ services:     # list all services for your application
   # server that listens order HTTP requests
   shopping-carts-daemon:
     image: ${DOCKER_ID}/scapp-shopping-carts:latest
-    # link both services (same effect of option --link in docker run)
-    depends_on: [ "shopping-carts-db" ]
-    # expose port number 3004 of host running this service
     ports: [ "3005:80" ]
     environment:
       - TOKEN_SECRET=AkbRocZI           # string to create tokens (see utils/en-de-coders.js)
@@ -200,9 +169,7 @@ services:     # list all services for your application
   # server that listens order HTTP requests
   products-daemon:
     image: ${DOCKER_ID}/scapp-products:latest
-    # link both services (same effect of option --link in docker run)
     depends_on: [ "products-db" ]
-    # expose port number 3004 of host running this service
     ports: [ "3007:80" ]
     environment:
       - TOKEN_SECRET=AkbRocZI           # string to create tokens (see utils/en-de-coders.js)
@@ -234,6 +201,59 @@ services:     # list all services for your application
         condition: on-failure
     networks: [ "scapp-net" ]
 
+
+  #######################
+  # Recommendations     #
+  #######################
+  recommendations-daemon:
+    image: ${DOCKER_ID}/scapp-recommendations:latest
+    depends_on: [ "logger-daemon", "recommendations-db" ]
+    ports: [ "3011:80" ]
+    environment:
+      - TOKEN_SECRET=AkbRocZI
+      - DEBUG=recommendations-d
+      - LOGGING_HOST=logger-daemon
+      - WITH_PERSISTENT_DATA=Y
+      - DB_HOST=recommendations-db
+      - DB_PORT=5984
+      - DB_NAME=recommendations
+      - GATEWAY_HOST=gateway
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks: [ "scapp-net" ]
+  
+  recommendations-db:
+    image: ${DOCKER_ID}/storage-system:latest
+    ports: ["3012:5984"]
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks: [ "scapp-net" ]
+
+
+
+  ###########
+  # gateway #
+  ###########
+  gateway:
+    image: ${DOCKER_ID}/scapp-gateway:latest
+    ports: [ "80:80" ]
+    deploy:
+      # locate this service in the swarm manager
+      placement:
+        constraints:
+          - node.role == manager
+    networks: [ "scapp-net" ]
+    depends_on: 
+      - users-daemon
+      - orders-daemon
+      - shopping-carts-daemon
+      - products-daemon
+      - logger-daemon
+
   ##############
   # visualizer #
   ##############
@@ -249,6 +269,7 @@ services:     # list all services for your application
         constraints:
           - node.role == manager
     networks: [ "scapp-net" ]
+
 networks:
   scapp-net:
     external: true
