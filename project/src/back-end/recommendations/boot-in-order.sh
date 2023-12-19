@@ -32,6 +32,26 @@ if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
   done
   echo "DB (${DB_NAME}) was created!"
 
+  echo "Apply a formatter for each view"
+  mkdir formatter_output
+  DEBUG=views* node func_to_string.js
+  if [[ ${?} != 0 ]]; then
+    echo -e "ERROR: during the creation of views\nEND OF ${0}"
+    exit 1
+  fi
+  echo -e "\tDONE"
+
+  cd formatter_output
+  echo "Creation of views for recommendations DB"
+  for view in `ls *.js`; do
+    curl -X PUT "${COUCHDB_URL}/_design/queries" --upload-file ${view}
+    if [[ ${?} != 0 ]]; then
+      echo -e "ERROR: during the creation of view ${view}\nEND OF ${0}"
+      exit 1
+    fi
+  done
+  echo -e "\tDONE"
+
 fi
 echo "Start recommendations service..."
 npm start

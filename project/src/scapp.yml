@@ -174,7 +174,7 @@ services:     # list all services for your application
     environment:
       - TOKEN_SECRET=AkbRocZI           # string to create tokens (see utils/en-de-coders.js)
       - DEBUG=products-d                # header for loggining messages
-      - LOGGING_HOST=logger-daemon     # name of container for loggining messages
+      - LOGGING_HOST=logger-daemon      # name of container for loggining messages
       - WITH_PERSISTENT_DATA=Y          # non empty string use perisitence (with CouchDB)
       - DB_HOST=products-db             # name of container running CouchDB
       - DB_PORT=5984                    # port number of CouchDB and logging db
