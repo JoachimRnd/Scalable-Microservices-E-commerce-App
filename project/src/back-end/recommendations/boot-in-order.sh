@@ -44,7 +44,7 @@ if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
   cd formatter_output
   echo "Creation of views for recommendations DB"
   for view in `ls *.js`; do
-    curl -X PUT "${COUCHDB_URL}/_design/queries" --upload-file ${view}
+    curl -X PUT "${DB_URL}/_design/recommendations" --upload-file ${view}
     if [[ ${?} != 0 ]]; then
       echo -e "ERROR: during the creation of view ${view}\nEND OF ${0}"
       exit 1

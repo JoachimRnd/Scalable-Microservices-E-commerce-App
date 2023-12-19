@@ -25,8 +25,8 @@ const viewDescriptor = {
       map: function(doc) {
         if (doc.items && doc.userId) {
           doc.items.forEach((item) => {
-            emit(doc.userId, {productId: item._id, quantity: item.quantity}); //todo check if this works
-          });
+            emit(doc.userId, {productId: item._id, quantity: item.quantity}) //todo check if this works
+          })
         }
       },
       reduce: function (key, values) {
