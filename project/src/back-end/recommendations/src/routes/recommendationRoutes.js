@@ -7,7 +7,7 @@ const loggerCrud = require('../utils/crud/crud-logger');
 
 module.exports = (recommendationCrud) => {
 
-  router.get('/', authMiddleware, (req, res) => {
+  /*router.get('/', authMiddleware, (req, res) => {
     const userId = req.userId;
 
     recommendationCrud.getRecommendations(userId) // todo exemple
@@ -25,7 +25,19 @@ module.exports = (recommendationCrud) => {
         });
         return res.status(500).json({ status: 'error', message: String(err) })
       });
+  });*/
+
+  router.get('/dailyTest', authMiddleware, (req, res) => {
+    const userId = req.userId;
+    console.log("daily test");
+    recommendationCrud.generateDailyRecommendations();
+   
+    return res.status(200).json({ status: 'success', data: "daily test done" })
   });
+
+
+
+
 
   return router;
 };

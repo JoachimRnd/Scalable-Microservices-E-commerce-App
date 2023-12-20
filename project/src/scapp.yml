@@ -207,7 +207,7 @@ services:     # list all services for your application
   #######################
   recommendations-daemon:
     image: ${DOCKER_ID}/scapp-recommendations:latest
-    depends_on: [ "logger-daemon", "recommendations-db" ]
+    depends_on: [ "logger-daemon", "products-daemon", "orders-daemon", "users-daemon", "shopping-carts-daemon", "recommendations-db" ]
     ports: [ "3011:80" ]
     environment:
       - TOKEN_SECRET=AkbRocZI
@@ -255,6 +255,7 @@ services:     # list all services for your application
       - shopping-carts-daemon
       - products-daemon
       - logger-daemon
+      - recommendations-daemon
 
   ##############
   # visualizer #

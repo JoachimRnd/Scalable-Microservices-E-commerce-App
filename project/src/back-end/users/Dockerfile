@@ -13,6 +13,7 @@ RUN npm install
 ADD gulpfile.js .
 ADD src src
 ADD boot-in-order.sh .
+ADD func_to_string.js .
 
 # we now use an script to deploy the authentication service
 CMD source boot-in-order.sh

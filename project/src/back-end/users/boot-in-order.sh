@@ -32,6 +32,27 @@ if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
   done
   echo "DB (${DB_NAME}) was created!"
 
+  echo "Apply a formatter for each view"
+  mkdir formatter_output
+  DEBUG=views* node func_to_string.js
+  if [[ ${?} != 0 ]]; then
+    echo -e "ERROR: during the creation of views\nEND OF ${0}"
+    exit 1
+  fi
+  echo -e "\tDONE"
+
+  echo "Creation of views for users DB"
+  for view in `ls ./formatter_output/*.js`; do
+    echo -e "\t${view}"
+    cat ${view} 
+    curl -X PUT "${DB_URL}/_design/users" --upload-file ${view}
+    if [[ ${?} != 0 ]]; then
+      echo -e "ERROR: during the creation of view ${view}\nEND OF ${0}"
+      exit 1
+    fi
+  done
+  echo -e "\tDONE"
+
   echo "Creating admin user..."
   curl --request PUT ${DB_URL}/admin \
       -d '{

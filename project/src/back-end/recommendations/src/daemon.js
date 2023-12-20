@@ -31,10 +31,9 @@ server.use((err, req, res, next) => {
   });
 });
 
-recommendationCrud.generateDailyRecommendations();
 cron.schedule('0 3 * * *', () => {
-  console.log("Running Cron Job");  
-  // recommendationCrud.generateDailyRecommendations();
+  console.log("Running generate daily recommendations");  
+  //recommendationCrud.generateDailyRecommendations();
 });
 
 const port = process.env.USERS_D_PORT || 80;

@@ -22,6 +22,9 @@ const viewDescriptor = {
     //   }
     // }
     // EXAMPLE
+    getRecommendationById: {
+      map: function (doc) { if (doc._id) { emit(doc._id, doc); }}
+    },
     movies_per_category: {
       map: function(doc) {
         if (doc.items && doc.userId) {
