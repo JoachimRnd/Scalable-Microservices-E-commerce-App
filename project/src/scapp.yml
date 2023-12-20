@@ -218,6 +218,8 @@ services:     # list all services for your application
       - DB_PORT=5984
       - DB_NAME=recommendations
       - GATEWAY_HOST=gateway
+      - ADMIN_NAME=admin
+      - ADMIN_PASSW=admin
     deploy:
       replicas: 1
       restart_policy:

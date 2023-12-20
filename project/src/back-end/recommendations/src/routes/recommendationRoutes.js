@@ -10,7 +10,7 @@ module.exports = (recommendationCrud) => {
   router.get('/', authMiddleware, (req, res) => {
     const userId = req.userId;
 
-    recommendationCrud.getRecommendations(userId)
+    recommendationCrud.getRecommendations(userId) // todo exemple
       .then(recommendations => {
         loggerCrud.info('Fetched recommendations', { userId, recommendations }, req)
         .catch((err) => {

@@ -1,6 +1,6 @@
 const path = require('path')
 const fs = require('fs')
-const viewsDir = path.join(__dirname, 'views')
+const viewsDir = path.join(__dirname, 'src/views')
 const outDir = path.join(__dirname, 'formatter_output')
 const log = require('debug')('views-formatter')
 
@@ -13,10 +13,16 @@ fs.readdir(viewsDir, (err, files) => {
     } else {
       var views = Object.keys(descriptor.views)
       views.map((view) => {
-        descriptor.views[view].map = descriptor.views[view].map.toString()
-        descriptor.views[view].reduce = descriptor.views[view].reduce.toString()
-      })
-      fs.writeFile(`${outDir}/${file}`, JSON.stringify(descriptor), (e) => {
+        if (descriptor.views[view].map) {
+          descriptor.views[view].map = descriptor.views[view].map.toString().replace("/\n/g", '');
+        }
+        if (descriptor.views[view].reduce) {
+          descriptor.views[view].reduce = descriptor.views[view].reduce.toString().replace(/\n/g, ''); //todo check for replace
+        }
+      });           
+      var descriptorJson = JSON.stringify(descriptor);
+      var descriptorBuffer = Buffer.from(descriptorJson, 'utf8');
+      fs.writeFile(`${outDir}/${file}`, descriptorBuffer, (e) => {
         if (e) throw e
         log(`succesful creation of file [${outDir}/${file}]`)
       })

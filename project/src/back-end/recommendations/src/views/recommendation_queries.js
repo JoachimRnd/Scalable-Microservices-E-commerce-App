@@ -21,6 +21,7 @@ const viewDescriptor = {
     //     return Math.round((sum(values)/values.length)*100)/100;
     //   }
     // }
+    // EXAMPLE
     movies_per_category: {
       map: function(doc) {
         if (doc.items && doc.userId) {
