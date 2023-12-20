@@ -2,6 +2,8 @@ const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 const log = require('debug')('users-d');
+const cron = require('node-cron');
+
 const recommendationRoutes = require('./routes/recommendationRoutes');
 const recommendationCrud = require('./utils/crud/crud-recommendation');
 
@@ -27,6 +29,12 @@ server.use((err, req, res, next) => {
   res.json({
     status: 'error'
   });
+});
+
+recommendationCrud.generateDailyRecommendations();
+cron.schedule('0 3 * * *', () => {
+  console.log("Running Cron Job");  
+  // recommendationCrud.generateDailyRecommendations();
 });
 
 const port = process.env.USERS_D_PORT || 80;
