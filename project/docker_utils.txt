@@ -2,7 +2,7 @@ VBoxManage startvm myvm-clone --type headless
 VBoxManage startvm myvm-elastic --type headless
 
 GET THE IP address of the vm from windows : 
-VBoxManage guestcontrol myvm-clone --username user --password user run --exe /bin/ip -- ip address show
+VBoxManage guestcontrol myvm-elastic --username user --password user run --exe /bin/ip -- ip address show
 
 FRONTEND : 
 

@@ -7,22 +7,18 @@ const users = require('nano')(process.env.DB_URL_USERS);
 async function generateDailyRecommendations() {
   try {
     const allProducts = await getProducts();
-    const allOrders = await getOrders();
     const allUsers = await getUsers();
 
-    console.log('allOrders', allOrders);
-    console.log('allProducts', allProducts);
-    console.log('allUsers', allUsers);
 
-    const globalTrends = allOrders.length > 0 ? await analyzeOrders(allOrders) : {};
+    const globalTrends = await analyze();
     console.log('globalTrends', globalTrends);
     for (let user of allUsers) {
       const userOrders = await getOrdersByUserId(user._id);
-      console.log('userOrders', userOrders)
-      const userTrends = userOrders.length > 0 ? await analyzeOrders(userOrders) : {};
+      const userTrends = await analyze(user._id);
       console.log('userTrends', userTrends);
 
       let userRecommendations = {};
+      userRecommendations.recommendations = {};
 
       allProducts.forEach(product => {
         let recommendationsSet = new Set();
@@ -31,19 +27,17 @@ async function generateDailyRecommendations() {
 
         // User specific trend recommendations
         addTrendRecommendations(recommendationsSet, userTrends, product, allProducts, threshold = 5); //threshold to change in production
-        console.log('productid', product._id)
         console.log('recommendationsSet', recommendationsSet)
-        userRecommendations[product._id] = Array.from(recommendationsSet);
+        userRecommendations.recommendations[product._id] = Array.from(recommendationsSet);
       });
       const existingRecommendation = await getRecommendationById(user._id);
       if (existingRecommendation.length > 0) {
         userRecommendations._rev = existingRecommendation[0]._rev;
       }
-      userRecommendations._id = user._id;
-      //TO CHANGE ID to base of the recommendations
-      await recommendations.insert({
-        recommendations: userRecommendations
-      });
+      userRecommendations._id = user._id,
+        await recommendations.insert(
+          userRecommendations
+        );
     }
 
   } catch (error) {
@@ -51,70 +45,103 @@ async function generateDailyRecommendations() {
   }
 }
 
-const analyzeOrders = async (orders) => {
-  let productFrequency = {};
-  let frequentlyBoughtTogether = {};
-  let categoryPreferences = {};
-  let uniqueProducts = new Map();
+const analyze = async (userId = null) => {
+  const productsFrequency = await getProductsFrequency(userId);
+  const frequentlyBoughtTogether = await getFrequentlyBoughtTogether(userId);
+  const categoryPreferences = await getCategoryPreferences(productsFrequency);
+  console.log('productsFrequency', productsFrequency);
+  console.log('frequentlyBoughtTogether', frequentlyBoughtTogether);
+  console.log('categoryPreferences', categoryPreferences);
 
-  orders.forEach(order => {
-    order.items.forEach(item => {
-      uniqueProducts.set(item._id, (uniqueProducts.get(item._id) || 0) + item.quantity);
-      productFrequency[item._id] = (productFrequency[item._id] || 0) + item.quantity;
+  return { productsFrequency, categoryPreferences, frequentlyBoughtTogether };
+}
+
+
+const getProductsFrequency = (userId) => {
+  return new Promise((resolve, reject) => {
+    let viewOptions = userId ? { startkey: [userId], endkey: [userId, {}], group: true } : { group: true };
+    orders.view('orders', 'productsFrequency', viewOptions, (err, body) => {
+      if (!err) {
+        let productsFrequency = {};
+        body.rows.forEach(row => {
+          let productId = row.key[1];
+          productsFrequency[productId] = row.value;
+        });
+        resolve(productsFrequency);
+      } else {
+        reject(new Error(`Error getting product frequency. Reason: ${err.reason}.`));
+      }
     });
   });
+}
 
+const getFrequentlyBoughtTogether = (userId) => {
+  return new Promise((resolve, reject) => {
+    let viewOptions = userId ? { startkey: [userId], endkey: [userId, {}], group: true } : { group: true };
+    orders.view('orders', 'frequentlyBoughtTogether', viewOptions, (err, body) => {
+      if (!err) {
+        let frequentlyBoughtTogether = {};
+        body.rows.forEach(row => {
+          console.log("======================================================================================================")
+          console.log('row get frequently bought together', row)
+          let productId1 = row.key[1];
+          let productId2 = row.key[2];
+
+          if (!frequentlyBoughtTogether[productId1]) {
+            frequentlyBoughtTogether[productId1] = {};
+          }
+          if (!frequentlyBoughtTogether[productId2]) {
+            frequentlyBoughtTogether[productId2] = {};
+          }
+          console.log("======================================================================================================")
+          frequentlyBoughtTogether[productId1][productId2] = row.value;
+          frequentlyBoughtTogether[productId2][productId1] = row.value;
+          console.log("FREQUENTLY BOUGHT TOGETHER", frequentlyBoughtTogether)
+        });
+        resolve(frequentlyBoughtTogether);
+      } else {
+        reject(new Error(`Error getting frequently bought together. Reason: ${err.reason}.`));
+      }
+    });
+  });
+}
+
+const getCategoryPreferences = async (productsFrequency) => {
   try {
-    const productsInfo = await getProductInfo(Array.from(uniqueProducts.keys()));
+    const productIds = Object.keys(productsFrequency);
+    const productsInfo = await getProductsById(productIds);
+
+    let categoryPreferences = {};
 
     productsInfo.forEach(product => {
-      let category = product.category;
-      let quantity = uniqueProducts.get(product._id) || 0;
+      const quantity = productsFrequency[product._id];
+      const category = product.category;
       categoryPreferences[category] = (categoryPreferences[category] || 0) + quantity;
     });
-  } catch (error) {
-    console.error('Error retrieving product information :', error);
+
+    return categoryPreferences;
+  } catch (err) {
+    reject(new Error(`Error calculating category preferences: Reason: ${err.reason}.`));
   }
+};
 
-  orders.forEach(order => {
-    const itemsInOrder = order.items.map(item => item._id);
 
-    itemsInOrder.forEach(itemId => {
-      itemsInOrder.forEach(otherItemId => {
-        if (itemId !== otherItemId) {
-          if (!frequentlyBoughtTogether[itemId]) {
-            frequentlyBoughtTogether[itemId] = {};
-          }
-          frequentlyBoughtTogether[itemId][otherItemId] = (frequentlyBoughtTogether[itemId][otherItemId] || 0) + 1;
-        }
-      });
+const addTrendRecommendations = (recommendationsSet, trends, product, allProducts, threshold) => {
+  if (trends.frequentlyBoughtTogether[product._id]) {
+    Object.entries(trends.frequentlyBoughtTogether[product._id]).forEach(([relatedProductId, frequency]) => {
+      if (frequency > threshold && product._id !== relatedProductId) {
+        recommendationsSet.add(relatedProductId);
+      }
     });
-  });
+  }
 
-  return { productFrequency, categoryPreferences, frequentlyBoughtTogether };
-}
-
-function addTrendRecommendations(recommendationsSet, trends, product, allProducts, threshold) {
-  if (Object.keys(trends).length > 0) {
-    if (trends.frequentlyBoughtTogether[product._id]) {
-      Object.entries(trends.frequentlyBoughtTogether[product._id]).forEach(([relatedProductId, frequency]) => {
-        if (frequency > threshold && product._id !== relatedProductId) {
-          recommendationsSet.add(relatedProductId);
-        }
-      });
-    }
-
-
-    // product concombre
-    console.log("trends.categoryPreferences", trends.categoryPreferences[product.category])
-    if (product.category in trends.categoryPreferences && trends.categoryPreferences[product.category] > threshold) {
-      allProducts.filter(p => p.category === product.category && p._id !== product._id && trends.productFrequency[product._id] > threshold)
-        .forEach(p => recommendationsSet.add(p._id));
-    }
+  if (product.category in trends.categoryPreferences && trends.categoryPreferences[product.category] > threshold) {
+    allProducts.filter(p => p.category === product.category && p._id !== product._id && trends.productsFrequency[product._id] > threshold)
+      .forEach(p => recommendationsSet.add(p._id));
   }
 }
 
-const getProductInfo = (productIds) => {
+const getProductsById = (productIds) => {
   return new Promise((resolve, reject) => {
     products.view('products', 'getProductsById', { keys: productIds, include_docs: true }, (err, body) => {
       if (err) {

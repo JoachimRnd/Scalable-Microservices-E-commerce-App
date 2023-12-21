@@ -25,18 +25,6 @@ const viewDescriptor = {
     getRecommendationById: {
       map: function (doc) { if (doc._id) { emit(doc._id, doc); }}
     },
-    movies_per_category: {
-      map: function(doc) {
-        if (doc.items && doc.userId) {
-          doc.items.forEach((item) => {
-            emit(doc.userId, {productId: item._id, quantity: item.quantity}) //todo check if this works
-          })
-        }
-      },
-      reduce: function (key, values) {
-        return sum(values)
-      }
-    },
   }
 }
 
