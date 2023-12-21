@@ -4,7 +4,54 @@ const shoppingCarts = require('nano')(process.env.DB_URL_SHOPPING_CARTS);
 const orders = require('nano')(process.env.DB_URL_ORDERS);
 const users = require('nano')(process.env.DB_URL_USERS);
 
-async function generateDailyRecommendations() {
+const getRecommendations = async (userId, productId) => {
+  try {
+    const userRecommendations = await getRecommendationsById(userId);
+    if (userRecommendations.length === 0) {
+      // todo if no recommendations, generate them
+      return [];
+    }
+    const recommendations = userRecommendations[0].recommendations;
+
+    const userCart = await getShoppingCartByUserId(userId);
+    const cartProductIds = userCart.items.map(item => item._id);
+
+    let finalRecommendations = new Set();
+
+    if (recommendations[productId] && recommendations[productId].length > 0) {
+      finalRecommendations.add(...recommendations[productId]);
+    }
+
+    cartProductIds.forEach(cartProductId => {
+      if (recommendations[cartProductId] && recommendations[cartProductId].length > 0) {
+        finalRecommendations.add(...recommendations[cartProductId]);
+      }
+    });
+    
+    finalRecommendations = Array.from(finalRecommendations);
+    
+    return finalRecommendations;
+
+  } catch (error) {
+    console.error('Error fetching recommendations:', error);
+    throw error;
+  }
+};
+
+const getShoppingCartByUserId = (userId) => {
+  return new Promise((resolve, reject) => {
+    shoppingCarts.view('carts', 'getShoppingCartById', { key: userId, include_docs: true }, (err, body) => {
+      if (!err) {
+        const carts = body.rows.map(row => row.doc);
+        resolve(carts);
+      } else {
+        reject(new Error(`Error getting shopping cart by ID. Reason: ${err.reason}.`));
+      }
+    });
+  });
+};
+
+const generateDailyRecommendations = async () => {
   try {
     const allProducts = await getProducts();
     const allUsers = await getUsers();
@@ -13,7 +60,6 @@ async function generateDailyRecommendations() {
     const globalTrends = await analyze();
     console.log('globalTrends', globalTrends);
     for (let user of allUsers) {
-      const userOrders = await getOrdersByUserId(user._id);
       const userTrends = await analyze(user._id);
       console.log('userTrends', userTrends);
 
@@ -23,14 +69,14 @@ async function generateDailyRecommendations() {
       allProducts.forEach(product => {
         let recommendationsSet = new Set();
         // Global trend recommendations
-        addTrendRecommendations(recommendationsSet, globalTrends, product, allProducts, threshold = 10); //threshold to change in production
-
+        addTrendRecommendations(recommendationsSet, globalTrends, product, allProducts, thresholdFrequency = 30, thresholdBoughtTogether = 10, thresholdCategoryPreferences = 40); //threshold very very low to test => to change in production
         // User specific trend recommendations
-        addTrendRecommendations(recommendationsSet, userTrends, product, allProducts, threshold = 5); //threshold to change in production
-        console.log('recommendationsSet', recommendationsSet)
+        addTrendRecommendations(recommendationsSet, userTrends, product, allProducts, thresholdFrequency = 15, thresholdBoughtTogether = 5, thresholdCategoryPreferences = 20); //threshold very very low to test => to change in production
+        console.log('recommendationsSet', recommendationsSet);
+
         userRecommendations.recommendations[product._id] = Array.from(recommendationsSet);
       });
-      const existingRecommendation = await getRecommendationById(user._id);
+      const existingRecommendation = await getRecommendationsById(user._id);
       if (existingRecommendation.length > 0) {
         userRecommendations._rev = existingRecommendation[0]._rev;
       }
@@ -126,17 +172,24 @@ const getCategoryPreferences = async (productsFrequency) => {
 };
 
 
-const addTrendRecommendations = (recommendationsSet, trends, product, allProducts, threshold) => {
+// Frequently bought together :
+// If a product 2 is frequently bought together with the product 1 (product param) and have a frequency of > thresholdBoughtTogether
+// Then add the product 2 as recommendation
+
+// Category preferences :
+// If a product 2 is frequently bought > thresholdFrequency and is in the same category than product 1 (product) and have a category frequency of > thresholdCategoryPreferences
+// Then add the product 2 as recommendation
+const addTrendRecommendations = (recommendationsSet, trends, product, allProducts, thresholdFrequency, thresholdBoughtTogether, thresholdCategoryPreferences) => {
   if (trends.frequentlyBoughtTogether[product._id]) {
     Object.entries(trends.frequentlyBoughtTogether[product._id]).forEach(([relatedProductId, frequency]) => {
-      if (frequency > threshold && product._id !== relatedProductId) {
+      if (frequency > thresholdBoughtTogether && product._id !== relatedProductId) {
         recommendationsSet.add(relatedProductId);
       }
     });
   }
 
-  if (product.category in trends.categoryPreferences && trends.categoryPreferences[product.category] > threshold) {
-    allProducts.filter(p => p.category === product.category && p._id !== product._id && trends.productsFrequency[product._id] > threshold)
+  if (product.category in trends.categoryPreferences && trends.categoryPreferences[product.category] > thresholdCategoryPreferences) {
+    allProducts.filter(p => p.category === product.category && p._id !== product._id && trends.productsFrequency[product._id] > thresholdFrequency)
       .forEach(p => recommendationsSet.add(p._id));
   }
 }
@@ -181,6 +234,19 @@ const getUsers = () => {
   });
 };
 
+const getRecommendationsById = (userId) => {
+  return new Promise((resolve, reject) => {
+    recommendations.view('recommendations', 'getRecommendationsById', { key: userId, include_docs: true }, (err, body) => {
+      if (!err) {
+        const recommendations = body.rows.map(row => row.doc);
+        resolve(recommendations);
+      } else {
+        reject(new Error(`Error getting recommendations by ID. Reason: ${err.reason}.`));
+      }
+    });
+  });
+};
+
 const getOrdersByUserId = (userId) => {
   return new Promise((resolve, reject) => {
     orders.view('orders', 'byUserId', { key: userId, include_docs: true }, (err, body) => {
@@ -207,19 +273,7 @@ const getOrders = () => {
   });
 };
 
-const getRecommendationById = (id) => {
-  return new Promise((resolve, reject) => {
-    recommendations.view('recommendations', 'getRecommendationById', { key: id, include_docs: true }, (err, body) => {
-      if (!err) {
-        const recommendations = body.rows.map(row => row.doc);
-        resolve(recommendations);
-      } else {
-        reject(new Error(`Error getting recommendations by ID. Reason: ${err.reason}.`));
-      }
-    });
-  });
-};
-
 module.exports = {
-  generateDailyRecommendations
+  generateDailyRecommendations,
+  getRecommendations
 };

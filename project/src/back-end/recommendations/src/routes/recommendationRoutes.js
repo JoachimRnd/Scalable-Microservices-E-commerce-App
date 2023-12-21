@@ -7,36 +7,29 @@ const loggerCrud = require('../utils/crud/crud-logger');
 
 module.exports = (recommendationCrud) => {
 
-  /*router.get('/', authMiddleware, (req, res) => {
-    const userId = req.userId;
+  // GET RECOMMENDATIONS BY PRODUCT ID AND RECOMMENDATION OF PRODUCTS IN THE SHOPPING CART
+  router.get('/:productId', authMiddleware, async (req, res) => {
+    try {
+      const userId = req.userId;
+      const productId = req.params.productId;
+      const recommendations = await recommendationCrud.getRecommendations(userId, productId);
+      return res.status(200).json({ status: 'success', data: recommendations });
+    } catch (error) {
+      // loggerCrud.error('Error fetching recommendations', { userId }, req)
+      // .catch((err) => {
+      //   console.log('error', err);
+      // }); TODO TO IMPLEMENT
+      console.error('Error fetching recommendations', error);
+      return res.status(500).json({ status: 'error', message: String(err) })
+    }
+  });
+  
 
-    recommendationCrud.getRecommendations(userId) // todo exemple
-      .then(recommendations => {
-        loggerCrud.info('Fetched recommendations', { userId, recommendations }, req)
-        .catch((err) => {
-          console.log('error', err);
-        });
-        return res.status(200).json({ status: 'success', data: recommendations })
-      })
-      .catch((err) => {
-        loggerCrud.error('Error fetching recommendations', { userId }, req)
-        .catch((err) => {
-          console.log('error', err);
-        });
-        return res.status(500).json({ status: 'error', message: String(err) })
-      });
-  });*/
-
-  router.get('/dailyTest', authMiddleware, (req, res) => {
-    const userId = req.userId;
-    console.log("daily test");
+  // useful for test
+  router.get('/launchDailyRecommendation', (req, res) => {
     recommendationCrud.generateDailyRecommendations();
-   
     return res.status(200).json({ status: 'success', data: "daily test done" })
   });
-
-
-
 
 
   return router;

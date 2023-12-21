@@ -36,7 +36,7 @@ if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
     --header 'Content-Type: application/json' \
     --data '{
       "views": {
-        "byId": {
+        "getShoppingCartById": {
           "map": "function (doc) { if (doc._id) { emit(doc._id, doc); }}"
         }
       }

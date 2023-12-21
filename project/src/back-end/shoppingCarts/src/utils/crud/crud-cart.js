@@ -17,12 +17,12 @@ const saveCart = (cart) => {
 
 const getCartById = (id) => {
   return new Promise((resolve, reject) => {
-    shoppingCarts.view('carts', 'byId', { key: id, include_docs: true }, (err, body) => {
+    shoppingCarts.view('carts', 'getShoppingCartById', { key: id, include_docs: true }, (err, body) => {
       if (!err) {
         const carts = body.rows.map(row => row.doc);
         resolve(carts);
       } else {
-        reject(new Error(`Error getting carts by ID. Reason: ${err.reason}.`));
+        reject(new Error(`Error getting shopping cart by ID. Reason: ${err.reason}.`));
       }
     });
   });

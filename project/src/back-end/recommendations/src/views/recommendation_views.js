@@ -22,7 +22,7 @@ const viewDescriptor = {
     //   }
     // }
     // EXAMPLE
-    getRecommendationById: {
+    getRecommendationsById: {
       map: function (doc) { if (doc._id) { emit(doc._id, doc); }}
     },
   }
