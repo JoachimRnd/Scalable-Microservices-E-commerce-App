@@ -18,7 +18,7 @@ These instructions will get you a copy of the project up and running on your loc
 To build all the docker images in the project, run the following command:
 
 :heavy_exclamation_mark: **Important:** Before building the docker images you need to find the IP of the manager node and change two files:
-- [scapp.yml](./scapp.yml) `line 65` - change the `PUBLIC_AUTH_SERVICE_URL` to the IP of the manager node
+- [scapp.yml](./scapp.yml) `line 65` - change the `PUBLIC_SERVICE_URL` to the IP of the manager node
 - [nginx.conf](./back-end/gateway/nginx.conf)  - change the `192.168.56.101` to the IP of the manager node for all occurrences of `192.168.56.101`.
 
 ```bash

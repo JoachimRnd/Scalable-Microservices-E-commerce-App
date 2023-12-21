@@ -11,7 +11,7 @@
 	let username = '';
 	let password = '';
 
-	const url = env.PUBLIC_AUTH_SERVICE_URL || "http://localhost:3001";
+	const url = env.PUBLIC_SERVICE_URL || "http://localhost:3001";
 
 	const handleOnSubmitBack = () => {
 		axios

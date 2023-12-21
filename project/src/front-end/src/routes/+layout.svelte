@@ -22,9 +22,6 @@
 		if (localCart) {
 			$cart = JSON.parse(localCart);
 		}
-
-		// Initialize local products list
-		// TODO
 	});
 
 	function logout() {

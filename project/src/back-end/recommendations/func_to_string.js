@@ -14,10 +14,10 @@ fs.readdir(viewsDir, (err, files) => {
       var views = Object.keys(descriptor.views)
       views.map((view) => {
         if (descriptor.views[view].map) {
-          descriptor.views[view].map = descriptor.views[view].map.toString().replace("/\n/g", '');
+          descriptor.views[view].map = descriptor.views[view].map.toString();
         }
         if (descriptor.views[view].reduce) {
-          descriptor.views[view].reduce = descriptor.views[view].reduce.toString().replace(/\n/g, ''); //todo check for replace
+          descriptor.views[view].reduce = descriptor.views[view].reduce.toString();
         }
       });           
       var descriptorJson = JSON.stringify(descriptor);

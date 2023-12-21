@@ -6,7 +6,7 @@
 	import { addToast } from "@stores/toasts";
 	import axios from "axios";
   
-	const url = env.PUBLIC_AUTH_SERVICE_URL || "http://localhost:3001";
+	const url = env.PUBLIC_SERVICE_URL || "http://localhost:3001";
   
 	let username = "";
 	let password = "";

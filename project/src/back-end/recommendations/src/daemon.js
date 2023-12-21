@@ -13,7 +13,7 @@ server.use(logger('dev'));
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: false }));
 
-server.use('/recommendation', recommendationRoutes(recommendationCrud));
+server.use('/recommendations', recommendationRoutes(recommendationCrud));
 
 server.use((req, res, next) => {
   const err = new Error('Not Found');

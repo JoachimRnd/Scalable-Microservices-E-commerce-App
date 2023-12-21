@@ -2,7 +2,7 @@
 	import { cart, totalPrice, totalQuantity } from "@stores/cart";
 	import axios from "axios";
 	import { env } from "$env/dynamic/public";
-	const url = env.PUBLIC_AUTH_SERVICE_URL;
+	const url = env.PUBLIC_SERVICE_URL;
 	import Modal from "@interfaces/misc/Modal.svelte";
 	import { goto } from "$app/navigation";
 	import { success, error } from "@stores/toasts";

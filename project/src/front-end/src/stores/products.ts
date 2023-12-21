@@ -4,7 +4,7 @@ import { env } from '$env/dynamic/public';
 import { addToast } from '@stores/toasts';
 import Product from '@interfaces/products/Product.svelte';
 
-const PRODUCT_URL = `${env.PUBLIC_AUTH_SERVICE_URL}/products`;
+const PRODUCT_URL = `${env.PUBLIC_SERVICE_URL}/products`;
 
 function createProducts() {
 	const { subscribe, set, update } = writable([]);

@@ -1,7 +1,7 @@
 import { derived, writable } from 'svelte/store';
 import axios from 'axios';
 import { env } from "$env/dynamic/public";
-const url = env.PUBLIC_AUTH_SERVICE_URL;
+const url = env.PUBLIC_SERVICE_URL;
 import { addToast } from "@stores/toasts";
 
 function createCart() {

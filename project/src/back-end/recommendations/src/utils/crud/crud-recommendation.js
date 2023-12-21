@@ -4,39 +4,75 @@ const shoppingCarts = require('nano')(process.env.DB_URL_SHOPPING_CARTS);
 const orders = require('nano')(process.env.DB_URL_ORDERS);
 const users = require('nano')(process.env.DB_URL_USERS);
 
+const global_recommendation_id = '7bd9dae1-3d94-4c46-9297-f8f965661ec3';
+
 const getRecommendations = async (userId, productId) => {
   try {
     const userRecommendations = await getRecommendationsById(userId);
-    if (userRecommendations.length === 0) {
-      // todo if no recommendations, generate them
-      return [];
+
+    let recommendations;
+    if (userRecommendations.length === 0) { // if no recommendations for the user, take the global recommendations
+      const globalRecommendations = await getRecommendationsById(global_recommendation_id);
+      if (globalRecommendations.length > 0) {
+        recommendations = globalRecommendations[0].recommendations;
+      } else {
+        return [];
+      }
+    } else {
+      recommendations = userRecommendations[0].recommendations;
     }
-    const recommendations = userRecommendations[0].recommendations;
+
+    console.log('recommendations', recommendations);
 
     const userCart = await getShoppingCartByUserId(userId);
-    const cartProductIds = userCart.items.map(item => item._id);
+    console.log('userCart', userCart);
+    let cartProductIds = new Set();
+    if (userCart.length > 0 && userCart[0].items) {
+      console.log('userCart[0].items', userCart[0].items);
+      userCart[0].items.forEach(item => cartProductIds.add(item._id));
+    }
 
-    let finalRecommendations = new Set();
+    console.log('cartProductIds', cartProductIds);
+
+    let finalRecommendationsId = new Set();
 
     if (recommendations[productId] && recommendations[productId].length > 0) {
-      finalRecommendations.add(...recommendations[productId]);
+      recommendations[productId].forEach(id => {
+        if (id !== productId && !cartProductIds.has(id)) {
+          finalRecommendationsId.add(id);
+        }
+      });
+      console.log('recommendations[productId]', recommendations[productId]);
     }
 
     cartProductIds.forEach(cartProductId => {
+      console.log('cartProductId', cartProductId)
+      console.log('recommendations[cartProductId]', recommendations[cartProductId])
       if (recommendations[cartProductId] && recommendations[cartProductId].length > 0) {
-        finalRecommendations.add(...recommendations[cartProductId]);
+        recommendations[cartProductId].forEach(id => {
+          if (id !== productId && !cartProductIds.has(id)) {
+            finalRecommendationsId.add(id);
+          }
+        });
       }
     });
-    
-    finalRecommendations = Array.from(finalRecommendations);
-    
-    return finalRecommendations;
 
+    finalRecommendationsId = Array.from(finalRecommendationsId);
+    console.log('finalRecommendationsId', finalRecommendationsId);
+
+    finalRecommendationsId = shuffleArray(finalRecommendationsId); // shuffle the recommendations
+    finalRecommendationsId = finalRecommendationsId.slice(0, 20); // take the 20 first recommendations
+
+    const productRecommendations = await getProductsById(finalRecommendationsId);
+    console.log('productRecommendations', productRecommendations);
+
+    return productRecommendations;
   } catch (error) {
     console.error('Error fetching recommendations:', error);
     throw error;
   }
 };
+
 
 const getShoppingCartByUserId = (userId) => {
   return new Promise((resolve, reject) => {
@@ -56,40 +92,53 @@ const generateDailyRecommendations = async () => {
     const allProducts = await getProducts();
     const allUsers = await getUsers();
 
-
-    const globalTrends = await analyze();
+    const globalTrends = await analyze(); // Analyze global trends once
     console.log('globalTrends', globalTrends);
+
+    let globalRecommendations = {};
+
+    allProducts.forEach(product => {
+      let recommendationsSet = new Set();
+      console.log("AVANT ADD GLOBAL TREND RECOMMENDATIONS")
+      addTrendRecommendations(recommendationsSet, globalTrends, product, allProducts, thresholdFrequency = 30, thresholdBoughtTogether = 10, thresholdCategoryPreferences = 40); //threshold very very low to test => to change in production
+      globalRecommendations[product._id] = Array.from(recommendationsSet);
+    });
+
+    console.log('globalRecommendations', globalRecommendations)
+    const existingGlobalRecommendation = await getRecommendationsById(global_recommendation_id);
+    if (existingGlobalRecommendation.length > 0) {
+      await recommendations.insert({ _id: global_recommendation_id, _rev: existingGlobalRecommendation[0]._rev, recommendations: globalRecommendations });
+    } else {
+      await recommendations.insert({ _id: global_recommendation_id, recommendations: globalRecommendations });
+    }
+
     for (let user of allUsers) {
       const userTrends = await analyze(user._id);
       console.log('userTrends', userTrends);
 
-      let userRecommendations = {};
-      userRecommendations.recommendations = {};
+      let userGlobalRecommendations = {};
+      userGlobalRecommendations.recommendations = {};
 
       allProducts.forEach(product => {
-        let recommendationsSet = new Set();
-        // Global trend recommendations
-        addTrendRecommendations(recommendationsSet, globalTrends, product, allProducts, thresholdFrequency = 30, thresholdBoughtTogether = 10, thresholdCategoryPreferences = 40); //threshold very very low to test => to change in production
-        // User specific trend recommendations
-        addTrendRecommendations(recommendationsSet, userTrends, product, allProducts, thresholdFrequency = 15, thresholdBoughtTogether = 5, thresholdCategoryPreferences = 20); //threshold very very low to test => to change in production
-        console.log('recommendationsSet', recommendationsSet);
-
-        userRecommendations.recommendations[product._id] = Array.from(recommendationsSet);
+        let recommendationsSet = new Set(globalRecommendations[product._id]);
+        addTrendRecommendations(recommendationsSet, userTrends, product, allProducts, thresholdFrequency = 5/*15*/, thresholdBoughtTogether = 2, thresholdCategoryPreferences = 5/*20*/); //threshold very very low to test => to change in production
+        userGlobalRecommendations.recommendations[product._id] = Array.from(recommendationsSet);
       });
+
       const existingRecommendation = await getRecommendationsById(user._id);
       if (existingRecommendation.length > 0) {
-        userRecommendations._rev = existingRecommendation[0]._rev;
+        userGlobalRecommendations._rev = existingRecommendation[0]._rev;
       }
-      userRecommendations._id = user._id,
-        await recommendations.insert(
-          userRecommendations
-        );
+      userGlobalRecommendations._id = user._id,
+
+        await recommendations.insert(userGlobalRecommendations);
     }
 
   } catch (error) {
     console.error('Error when generating recommendations:', error);
   }
 }
+
 
 const analyze = async (userId = null) => {
   const productsFrequency = await getProductsFrequency(userId);
@@ -128,8 +177,6 @@ const getFrequentlyBoughtTogether = (userId) => {
       if (!err) {
         let frequentlyBoughtTogether = {};
         body.rows.forEach(row => {
-          console.log("======================================================================================================")
-          console.log('row get frequently bought together', row)
           let productId1 = row.key[1];
           let productId2 = row.key[2];
 
@@ -139,10 +186,8 @@ const getFrequentlyBoughtTogether = (userId) => {
           if (!frequentlyBoughtTogether[productId2]) {
             frequentlyBoughtTogether[productId2] = {};
           }
-          console.log("======================================================================================================")
           frequentlyBoughtTogether[productId1][productId2] = row.value;
           frequentlyBoughtTogether[productId2][productId1] = row.value;
-          console.log("FREQUENTLY BOUGHT TOGETHER", frequentlyBoughtTogether)
         });
         resolve(frequentlyBoughtTogether);
       } else {
@@ -187,10 +232,13 @@ const addTrendRecommendations = (recommendationsSet, trends, product, allProduct
       }
     });
   }
-
+  console.log('trends.categoryPreferences', trends.categoryPreferences[product.category]);
   if (product.category in trends.categoryPreferences && trends.categoryPreferences[product.category] > thresholdCategoryPreferences) {
-    allProducts.filter(p => p.category === product.category && p._id !== product._id && trends.productsFrequency[product._id] > thresholdFrequency)
-      .forEach(p => recommendationsSet.add(p._id));
+
+    allProducts.filter(p => p.category === product.category && p._id !== product._id && trends.productsFrequency[p._id] > thresholdFrequency)
+      .forEach(p => {
+        recommendationsSet.add(p._id)
+      });
   }
 }
 
@@ -247,31 +295,13 @@ const getRecommendationsById = (userId) => {
   });
 };
 
-const getOrdersByUserId = (userId) => {
-  return new Promise((resolve, reject) => {
-    orders.view('orders', 'byUserId', { key: userId, include_docs: true }, (err, body) => {
-      if (!err) {
-        const orders = body.rows.map(row => row.doc);
-        resolve(orders);
-      } else {
-        reject(new Error(`Error getting orders by user ID. Reason: ${err.reason}.`));
-      }
-    });
-  });
+const shuffleArray = (array) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 }
-
-const getOrders = () => {
-  return new Promise((resolve, reject) => {
-    orders.view('orders', 'getOrders', { include_docs: true }, (err, body) => {
-      if (err) {
-        reject(new Error(`Error getting all orders. Reason: ${err.reason}.`));
-      } else {
-        const allOrders = body.rows.map(row => row.doc);
-        resolve(allOrders);
-      }
-    });
-  });
-};
 
 module.exports = {
   generateDailyRecommendations,

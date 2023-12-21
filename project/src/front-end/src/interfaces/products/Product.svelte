@@ -3,6 +3,8 @@
   import { cart } from "@stores/cart";
   import { success } from "@stores/toasts";
   import Modal from "@interfaces/misc/Modal.svelte";
+  import axios from "axios";
+  import { env } from "$env/dynamic/public";
 
   let showModal = false;
 
@@ -17,10 +19,38 @@
   export let product: Product;
 
   let quantity: number = 0;
+  let recommendations: Product[] = [];
+
+  const url = env.PUBLIC_SERVICE_URL;
+
+  let loading = false;
+
+  const showQuickView = async (productId) => {
+    showModal = true;
+    loading = true;
+
+    if ($user.isLogged) {
+      let localUser = window.localStorage.getItem("auth");
+      const token = JSON.parse(localUser || "").token;
+
+      try {
+        const recommendationsResponse = await axios.get(
+          `${url}/recommendations/${productId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+        recommendations = recommendationsResponse.data.data || [];
+      } catch (error) {
+        console.error("Error fetching recommendations:", error);
+      }
+      loading = false;
+    }
+  };
+
   function addToCart() {
     cart.addToCart({ ...product, quantity });
     quantity = 0;
-
     success("Added item to cart");
   }
 </script>
@@ -33,7 +63,7 @@
       class="card-img-top"
       src={product.image}
       alt="..."
-      on:click={() => (showModal = true)}
+      on:click={() => showQuickView(product._id)}
     />
     <!-- Product details-->
     <div class="card-body p-4">
@@ -88,18 +118,49 @@
       </h2>
       <div class="container">
         <img class="card-img-top" src={product.image} alt={product.name} />
-        <!-- <h2 class="text-lg">About the product</h2> -->
-        <!-- <p>TODO: write down small description...</p> -->
-        <br />
-        <hr class="mb-3" />
-        <h3>Customers who bought this item also bought</h3>
-        <p>TODO: fetch recommendations</p>
+        {#if $user.isLogged}
+          <br />
+          <hr class="mb-3" />
+          <h3>Recommendations</h3>
+          {#if loading}
+          <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+          {:else if recommendations.length > 0}
+            <div class="recommendations-grid">
+              {#each recommendations as recommendedProduct}
+                <div class="recommended-product">
+                  <img
+                    src={recommendedProduct.image}
+                    alt={recommendedProduct.name}
+                  />
+                  <p>{recommendedProduct.name}</p>
+                  <p>${recommendedProduct.price}</p>
+                </div>
+              {/each}
+            </div>
+          {:else}
+            <p>No recommendations available.</p>
+          {/if}
+        {/if}
       </div>
     </Modal>
   </div>
 </div>
 
 <style>
+  .recommendations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+  }
+
+  .recommended-product img {
+    width: 100%;
+    height: auto;
+  }
   /* Chrome, Safari, Edge, Opera */
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {

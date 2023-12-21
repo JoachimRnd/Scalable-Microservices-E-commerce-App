@@ -4,7 +4,7 @@
 
 	import axios from "axios";
 	import { env } from "$env/dynamic/public";
-	const url = env.PUBLIC_AUTH_SERVICE_URL;
+	const url = env.PUBLIC_SERVICE_URL;
 
 	import { addToast } from "@stores/toasts";
 
@@ -17,7 +17,7 @@
 			let localUser = window.localStorage.getItem("auth");
 			const token = JSON.parse(localUser).token;
 
-			const response = await axios.get(`${url}/order/user/orders`, {
+			const response = await axios.get(`${url}/orders/user/orders`, {
 				headers: { Authorization: `Bearer ${token}` },
 			});
 
@@ -99,7 +99,7 @@
 
 		//Adding order in orders-db
 		axios
-			.post(`${url}/order/checkout`, bodyParameters, config)
+			.post(`${url}/orders/checkout`, bodyParameters, config)
 			.then((res) => {
 				addToast({
 					message: "Order completed",

@@ -11,7 +11,7 @@ server.use(logger('dev'));
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: false }));
 
-server.use('/order', orderRoutes(orderCrud));
+server.use('/orders', orderRoutes(orderCrud));
 
 server.use((req, res, next) => {
   const err = new Error('Not Found');

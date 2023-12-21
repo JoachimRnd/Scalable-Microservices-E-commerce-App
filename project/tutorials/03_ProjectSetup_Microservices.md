@@ -38,7 +38,7 @@ Use resources online if necessary to make sure you have a clear vision of how th
   import { addToast } from "@stores/toasts";
   import axios from "axios";
 
-  const url = env.PUBLIC_AUTH_SERVICE_URL || "http://localhost:3001";
+  const url = env.PUBLIC_SERVICE_URL || "http://localhost:3001";
 
   let username = "";
   let password = "";
@@ -110,7 +110,7 @@ The functions *handleOnSubmit()* sends a HTTP request of the AuthServ REST API.
 To send this HTTP request, we will use the `axios` package.
 
 :warning:
-Note that the URL of AuthServ is taken from the environment variable `PUBLIC_AUTH_SERVICE_URL`. Be sure you set this variable accordingly, either in the Dockerfile or using the option `-e` in the command `docker run`.
+Note that the URL of AuthServ is taken from the environment variable `PUBLIC_SERVICE_URL`. Be sure you set this variable accordingly, either in the Dockerfile or using the option `-e` in the command `docker run`.
 
 :warning:
 Your login page ([see code](../src/front-end/src/routes/login/+page.svelte)) still uses the old non-persistent login logic.
