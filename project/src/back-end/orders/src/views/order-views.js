@@ -20,6 +20,7 @@ const viewDescriptor = {
                 for (var i = 0; i < sortedItems.length; i++) {
                     for (var j = i + 1; j < sortedItems.length; j++) {
                         emit([doc.userId, sortedItems[i], sortedItems[j]], 1);
+                        emit([doc.userId, sortedItems[j], sortedItems[i]], 1);
                     }
                 }
             },
