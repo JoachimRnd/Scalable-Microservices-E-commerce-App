@@ -126,7 +126,7 @@ swarm-deploy:
 	@echo "${GREEN}Deploying stack to swarm...${NC}"
 	@docker stack deploy --resolve-image always -c src/scapp.yml scapp
 
-swarm-deploy-with-scaling: swarm-deploy stop-elastic-scaling launch-elastic-scaling
+swarm-deploy-with-scaling: swarm-deploy scaling-reload
 
 swarm-remove: stop-elastic-scaling
 	@echo -e "${GREEN}Removing stack from swarm...${NC}"

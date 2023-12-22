@@ -20,6 +20,7 @@
 
   let quantity: number = 0;
   let recommendations: Product[] = [];
+  let recommendedQuantities: { [key: string]: number } = {};
 
   const url = env.PUBLIC_SERVICE_URL;
 
@@ -41,6 +42,9 @@
           },
         );
         recommendations = recommendationsResponse.data.data || [];
+        recommendations.forEach((product) => {
+          recommendedQuantities[product._id] = 0;
+        });
       } catch (error) {
         console.error("Error fetching recommendations:", error);
       }
@@ -48,11 +52,12 @@
     }
   };
 
-  function addToCart() {
-    cart.addToCart({ ...product, quantity });
-    quantity = 0;
-    success("Added item to cart");
-  }
+  const addToCart = (productToAdd: Product, quantityToAdd: number) => {
+    if (quantityToAdd > 0) {
+      cart.addToCart({ ...productToAdd, quantity: quantityToAdd });
+      success("Added item to cart");
+    }
+  };
 </script>
 
 <div class="col mb-5">
@@ -82,7 +87,9 @@
             class="flex flex-row h-10 w-full rounded-lg relative bg-transparent mt-1"
           >
             <button
-              on:click={() => quantity--}
+              on:click={() => {
+                if (quantity > 0) quantity--;
+              }}
               class=" bg-pink-500 text-gray-600 hover:text-gray-700 hover:bg-pink-600 h-full w-20 rounded-l cursor-pointer outline-none"
             >
               <span class="m-auto text-2xl font-thin">−</span>
@@ -103,7 +110,10 @@
           <button
             disabled={quantity == 0}
             class="p-1 transition ease-in-out bg-gradient-to-r from-pink-500 to-yellow-500 to-90% text-center font-semibold text-md w-full text-white hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300 rounded-md"
-            on:click={addToCart}>Add to cart</button
+            on:click={() => {
+              addToCart(product, quantity);
+              quantity = 0;
+            }}>Add to cart</button
           >
         </div>
       </div>
@@ -123,11 +133,11 @@
           <hr class="mb-3" />
           <h3>Recommendations</h3>
           {#if loading}
-          <div class="d-flex justify-content-center">
-            <div class="spinner-border" role="status">
-              <span class="visually-hidden">Loading...</span>
+            <div class="d-flex justify-content-center">
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
             </div>
-          </div>
           {:else if recommendations.length > 0}
             <div class="recommendations-grid">
               {#each recommendations as recommendedProduct}
@@ -135,9 +145,62 @@
                   <img
                     src={recommendedProduct.image}
                     alt={recommendedProduct.name}
+                    class="recommendation-image"
                   />
-                  <p>{recommendedProduct.name}</p>
-                  <p>${recommendedProduct.price}</p>
+                  <div class="recommendation-info">
+                    <p>{recommendedProduct.name}</p>
+                    <p>${recommendedProduct.price}</p>
+                    <div
+                      class="card-footer p-4 pt-0 border-top-0 bg-transparent mb-4"
+                    >
+                      <div class="custom-number-input h-10 w-32 m-auto">
+                        <div
+                          class="flex flex-row h-10 w-full rounded-lg relative bg-transparent mt-1"
+                        >
+                          <button
+                            on:click={() => {
+                              if (
+                                recommendedQuantities[recommendedProduct._id] >
+                                0
+                              )
+                                recommendedQuantities[recommendedProduct._id]--;
+                            }}
+                            class="bg-pink-500 text-gray-600 hover:text-gray-700 hover:bg-pink-600 h-full w-20 rounded-l cursor-pointer outline-none"
+                          >
+                            <span class="m-auto text-2xl font-thin">−</span>
+                          </button>
+                          <input
+                            type="number"
+                            class="outline-none focus:outline-none text-center w-full bg-gradient-to-r from-pink-500 to-yellow-500 font-semibold text-md hover:text-black focus:text-black md:text-basecursor-default flex items-center text-gray-700 outline-none"
+                            bind:value={recommendedQuantities[
+                              recommendedProduct._id
+                            ]}
+                          />
+                          <button
+                            on:click={() =>
+                              recommendedQuantities[recommendedProduct._id]++}
+                            class="bg-yellow-500 text-gray-600 hover:text-gray-700 hover:bg-yellow-600 h-full w-20 rounded-r cursor-pointer"
+                          >
+                            <span class="m-auto text-2xl font-thin">+</span>
+                          </button>
+                        </div>
+
+                        <button
+                          disabled={recommendedQuantities[
+                            recommendedProduct._id
+                          ] == 0}
+                          class="p-1 transition ease-in-out bg-gradient-to-r from-pink-500 to-yellow-500 to-90% text-center font-semibold text-md w-full text-white hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300 rounded-md"
+                          on:click={() => {
+                            addToCart(
+                              recommendedProduct,
+                              recommendedQuantities[recommendedProduct._id],
+                            );
+                            recommendedQuantities[recommendedProduct._id] = 0;
+                          }}>Add to cart</button
+                        >
+                      </div>
+                    </div>
+                  </div>
                 </div>
               {/each}
             </div>
@@ -151,6 +214,18 @@
 </div>
 
 <style>
+  .recommended-product {
+    transition:
+      transform 0.4s ease,
+      box-shadow 0.4s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .recommended-product:hover {
+    transform: scale(1.04);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  }
+
   .recommendations-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -161,6 +236,7 @@
     width: 100%;
     height: auto;
   }
+
   /* Chrome, Safari, Edge, Opera */
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {

@@ -7,7 +7,7 @@ config:
 scenarios:
   - flow:
     - post:
-        url: /orders/checkout
+        url: /orders
         json:
         order: test
         token: test2

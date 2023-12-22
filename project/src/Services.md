@@ -180,7 +180,7 @@ make orders-push
 
 The Order service exposes two routes:
 
-- **POST /orders/checkout**: Create a new order in the database for the authenticated user. The body of the request must be a json object with the following fields:
+- **POST /orders**: Create a new order in the database for the authenticated user. The body of the request must be a json object with the following fields:
   - ***items***: An array of json objects containing the orders. Each item has the following fields:
     - ***id***: The id of the product item to checkout.
     - ***quantity***: The quantity of the item to checkout.
@@ -189,7 +189,7 @@ The Order service exposes two routes:
     - ***totalPrice***: The total price of the order.
     - ***date***: The date of the order.
 
-- **GET /orders/user/orders**: Retrieves all orders associated with the authenticated user. The service returns a JSON object with the following fields:
+- **GET /orders**: Retrieves all orders associated with the authenticated user. The service returns a JSON object with the following fields:
   - ***status***: The status of the request (success, error).
   - ***_id***: The id of the order given by the `CouchDB`.
   - ***_rev***: The revision of the order given by the `CouchDB`.
