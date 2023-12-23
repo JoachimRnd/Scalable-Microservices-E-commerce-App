@@ -15,21 +15,32 @@ const computeTimeDifference = (req) => {
 
 const info = (message, data, req) => {
     return new Promise((resolve, reject) => {
-        const timeDifference = computeTimeDifference(req);
-        logger.post(`${gateway}/logger/user/info`, { message, data, startTime: req._startTime, request_time_ms : timeDifference})
-            .then((success) => {
-                resolve(success);
-            })
-            .catch((error) => {
-                reject(error);
-            });
+        if (req) {
+            const timeDifference = computeTimeDifference(req);
+            logger.post(`${gateway}/logger/recommendations/info`, { message, data, startTime: req._startTime, request_time_ms : timeDifference})
+                .then((success) => {
+                    resolve(success);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        } else {
+            logger.post(`${gateway}/logger/recommendations/info`, { message, data})
+                .then((success) => {
+                    resolve(success);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        }
+        
     });
 }
 
 const error = (message, data, req) => {
     return new Promise((resolve, reject) => {
         const timeDifference = computeTimeDifference(req);
-        logger.post(`${gateway}/logger/user/error`, { message, data, startTime: req._startTime, request_time_ms : timeDifference })
+        logger.post(`${gateway}/logger/recommendations/error`, { message, data, startTime: req._startTime, request_time_ms : timeDifference })
             .then((success) => {
                 resolve(success);
             })

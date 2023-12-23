@@ -99,6 +99,13 @@ curl --request PUT \
     }
   }'
 
+echo "Wait (indefenitly) until the DB creation (name: recommendations-d-logs)."
+echo "The DB URL is: ${DB_URL}"
+until curl --request PUT ${DB_URL}/recommendations-d-logs ; do
+  echo -e "\t DB (recommendations-d-logs) wasn't created - trying again later..."
+  sleep 2
+done
+
 
 echo "Start users service..."
 npm start

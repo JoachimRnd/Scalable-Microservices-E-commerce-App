@@ -1,5 +1,11 @@
 # Variables  
-                                                                                                                                                                                                              
+# DOCKER_ID=mxdx02
+AZURE_MANAGER=dns-weu-3-mxdx.westeurope.cloudapp.azure.com
+AZURE_MANAGER_ADMIN=maxime
+AZURE_MANAGER_IP=$(shell dig +short $(AZURE_MANAGER))
+
+LOCAL_MANAGER_IP=192.168.56.101
+
 # Colors                                                                                                                                                                                                       
 RED=\033[0;31m                                                                                                                                                                                                 
 GREEN=\033[0;32m                                                                                                                                                                                               
@@ -30,6 +36,7 @@ products: products-build products-push
 shopping-carts: shopping-carts-build shopping-carts-push
 recommendations: recommendations-build recommendations-push
 logger: logger-build logger-push
+azure: azure-build azure-push azure-deploy
 
 ###############                                                                                                                                                                                                               
 # Small tasks #
@@ -174,7 +181,7 @@ elastic-scaling-recommendations-daemon-test: launch-elastic-scaling artillery-bu
 
 # Force pull from docker hub
 pull:
-	@echo -e "${GREEN}Pulling images from docker hub...${NC}"
+	@echo "${GREEN}Pulling images from docker hub...${NC}"
 	@docker pull ${DOCKER_ID}/scapp-frontend:latest
 	@docker pull ${DOCKER_ID}/storage-system
 	@docker pull ${DOCKER_ID}/scapp-auth
@@ -184,3 +191,27 @@ pull:
 	@docker pull ${DOCKER_ID}/scapp-recommendations
 	@docker pull ${DOCKER_ID}/scapp-gateway
 	@docker pull ${DOCKER_ID}/scapp-logger
+
+update-service-url-local:
+	@echo "Updating PUBLIC_SERVICE_URL in scapp.yml..."
+	@sed -i 's|PUBLIC_SERVICE_URL=http://[^ ]*|PUBLIC_SERVICE_URL=http://$(LOCAL_MANAGER_IP):80|' src/scapp.yml
+	@echo "Updating DNS name in nginx.conf..."
+	@sed -i '/upstream _gateway {/,/}/c\upstream _gateway {\n\tserver $(LOCAL_MANAGER_IP);\n\tserver gateway;\n}' src/back-end/gateway/nginx.conf
+
+# Azure tasks
+update-service-url-azure:
+	@echo "Updating PUBLIC_SERVICE_URL in scapp.yml..."
+	@sed -i 's|PUBLIC_SERVICE_URL=http://[^ ]*|PUBLIC_SERVICE_URL=http://$(AZURE_MANAGER_IP):80|' src/scapp.yml
+	@echo "Updating DNS name in nginx.conf..."
+	@sed -i '/upstream _gateway {/,/}/c\upstream _gateway {\n\tserver $(AZURE_MANAGER);\n\tserver gateway;\n}' src/back-end/gateway/nginx.conf
+
+azure-build: update-service-url-azure full
+
+azure-push: update-service-url-azure
+	@echo "${GREEN}Pushing images to azure...${NC}"
+	@scp ./src/scapp.yml ${AZURE_MANAGER_ADMIN}@${AZURE_MANAGER}:~/
+
+azure-deploy: 
+	@echo "${GREEN}Deploying stack to azure...${NC}"
+	@ssh ${AZURE_MANAGER_ADMIN}@${AZURE_MANAGER} "docker stack rm scapp"
+	@ssh ${AZURE_MANAGER_ADMIN}@${AZURE_MANAGER} "DOCKER_ID=${DOCKER_ID} docker stack deploy --resolve-image always -c scapp.yml scapp"

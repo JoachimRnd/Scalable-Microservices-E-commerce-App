@@ -12,7 +12,7 @@ module.exports = (productsCrud) => {
     const product = req.body.product;
     const userId = req.userId;
 
-    productsCrud.createProduct(product)
+    productsCrud.createProduct(product, req)
     .then((successMessage) => {
       loggerCrud.info('Product created', { product, userId }, req)
         .catch((err) => {
@@ -34,7 +34,7 @@ module.exports = (productsCrud) => {
     const product = req.body.product;
     const userId = req.userId;
 
-    productsCrud.updateProduct(product)
+    productsCrud.updateProduct(product, req)
       .then((successMessage) => {
         loggerCrud.info('Product updated', { product, userId, old_rev: product._rev, new_rev: successMessage._rev }, req)
           .catch((err) => {
