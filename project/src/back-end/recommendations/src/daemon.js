@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const log = require('debug')('users-d');
 const cron = require('node-cron');
 
+const loggerCrud = require('./utils/crud/crud-logger');
+
 const recommendationRoutes = require('./routes/recommendationRoutes');
 const recommendationCrud = require('./utils/crud/crud-recommendation');
 
@@ -31,10 +33,17 @@ server.use((err, req, res, next) => {
   });
 });
 
-cron.schedule('0 3 * * *', () => {
-  console.log("Running generate daily recommendations");  //TODO DONT RUN IF SCALABLE ==> only one have to run
-  //recommendationCrud.generateDailyRecommendations();
+cron.schedule('*/0.5 * * * *', async () => {
+  console.log("Running generate daily recommendations");  
+  try {
+    recommendationCrud.generateDailyRecommendations();
+    loggerCrud.info('Daily recommendations generated', {}, null)
+  } catch (err) {
+    loggerCrud.error('Error generating daily recommendations', {}, err);
+    console.error('Error generating daily recommendations', err);
+  }
 });
+
 
 const port = process.env.USERS_D_PORT || 80;
 server.listen(port, function () {

@@ -8,7 +8,7 @@ const logsUser = require('nano')(`${process.env.DB_URL}/users-d-logs`);
 const logsOrders = require('nano')(`${process.env.DB_URL}/orders-d-logs`);
 const logsCarts = require('nano')(`${process.env.DB_URL}/carts-d-logs`);
 const logsProducts = require('nano')(`${process.env.DB_URL}/products-d-logs`);
-
+const logsRecommendations = require('nano')(`${process.env.DB_URL}/recommendations-d-logs`);
 
 module.exports = () => {
 
@@ -31,6 +31,18 @@ module.exports = () => {
   });
 
 
+
+  router.post('/recommendations/info', (req, res) => { 
+    loggerCrud.info(req.body, logsRecommendations)
+      .then((token) => res.status(200).json({ status: 'success', token }))
+      .catch((err) => res.status(409).json({ status: 'error', message: String(err) }));
+  });
+
+  router.post('/recommendations/error', (req, res) => {
+    loggerCrud.error(req.body, logsRecommendations)
+      .then((token) => res.status(200).json({ status: 'success', token }))
+      .catch((err) => res.status(409).json({ status: 'error', message: String(err) }));
+  });
 
 
   router.post('/user/info', (req, res) => {

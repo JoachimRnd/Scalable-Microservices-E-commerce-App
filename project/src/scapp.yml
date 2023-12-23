@@ -40,7 +40,8 @@ services:     # list all services for your application
     image: ${DOCKER_ID}/scapp-frontend:latest
     ports: [ "3002:3000" ]
     environment:
-      - PUBLIC_SERVICE_URL=http://192.168.56.101:80
+      - PUBLIC_SERVICE_URL=http://13.81.202.134
+      #http://192.168.56.101:80
     deploy:
       # deploy 3 instances of this service
       replicas: 1
@@ -136,7 +137,7 @@ services:     # list all services for your application
     environment:
       - TOKEN_SECRET=AkbRocZI           # string to create tokens (see utils/en-de-coders.js)
       - DEBUG=shopping-carts-d          # header for loggining messages
-      - LOGGING_HOST=logger-daemon     # name of container for loggining messages
+      - LOGGING_HOST=logger-daemon      # name of container for loggining messages
       - WITH_PERSISTENT_DATA=Y          # non empty string use perisitence (with CouchDB)
       - DB_HOST=shopping-carts-db       # name of container running CouchDB
       - DB_PORT=5984                    # port number of CouchDB and logging db

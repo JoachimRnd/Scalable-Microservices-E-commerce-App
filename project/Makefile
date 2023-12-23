@@ -1,5 +1,8 @@
 # Variables  
-                                                                                                                                                                                                              
+# DOCKER_ID=
+AZURE_MANAGER=dns-weu-3-mxdx.westeurope.cloudapp.azure.com
+AZURE_MANAGER_ADMIN=maxime
+
 # Colors                                                                                                                                                                                                       
 RED=\033[0;31m                                                                                                                                                                                                 
 GREEN=\033[0;32m                                                                                                                                                                                               
@@ -170,7 +173,7 @@ elastic-scaling-products-daemon-test: launch-elastic-scaling artillery-build
 
 # Force pull from docker hub
 pull:
-	@echo -e "${GREEN}Pulling images from docker hub...${NC}"
+	@echo "${GREEN}Pulling images from docker hub...${NC}"
 	@docker pull ${DOCKER_ID}/scapp-frontend:latest
 	@docker pull ${DOCKER_ID}/storage-system
 	@docker pull ${DOCKER_ID}/scapp-auth
@@ -180,3 +183,10 @@ pull:
 	@docker pull ${DOCKER_ID}/scapp-recommendations
 	@docker pull ${DOCKER_ID}/scapp-gateway
 	@docker pull ${DOCKER_ID}/scapp-logger
+
+azure-push: full
+	@echo "${GREEN}Pushing images to azure...${NC}"
+	@scp ./src/scapp.yml ${AZURE_MANAGER_ADMIN}@${AZURE_MANAGER}:~/
+
+azure-deploy: azure-push
+	@ssh ${AZURE_MANAGER_ADMIN}@${AZURE_MANAGER} "docker stack deploy --resolve-image always -c scapp.yml scapp"
