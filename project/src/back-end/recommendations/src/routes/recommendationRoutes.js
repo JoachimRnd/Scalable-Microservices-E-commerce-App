@@ -7,10 +7,10 @@ const loggerCrud = require('../utils/crud/crud-logger');
 
 module.exports = (recommendationCrud) => {
 
-  // useful for test
+  // useful for test => to remove in production
   router.get('/launchDailyRecommendation', (req, res) => {
     recommendationCrud.generateDailyRecommendations();
-    return res.status(200).json({ status: 'success', data: "daily test done" })
+    return res.status(200).json({ status: 'success', data: "Daily recommendations generation" })
   });
 
   // GET RECOMMENDATIONS BY PRODUCT ID AND RECOMMENDATION OF PRODUCTS IN THE SHOPPING CART

@@ -22,17 +22,11 @@ const getRecommendations = async (userId, productId) => {
       recommendations = userRecommendations[0].recommendations;
     }
 
-    console.log('recommendations', recommendations);
-
     const userCart = await getShoppingCartByUserId(userId);
-    console.log('userCart', userCart);
     let cartProductIds = new Set();
     if (userCart.length > 0 && userCart[0].items) {
-      console.log('userCart[0].items', userCart[0].items);
       userCart[0].items.forEach(item => cartProductIds.add(item._id));
     }
-
-    console.log('cartProductIds', cartProductIds);
 
     let finalRecommendationsId = new Set();
 
@@ -42,12 +36,9 @@ const getRecommendations = async (userId, productId) => {
           finalRecommendationsId.add(id);
         }
       });
-      console.log('recommendations[productId]', recommendations[productId]);
     }
 
     cartProductIds.forEach(cartProductId => {
-      console.log('cartProductId', cartProductId)
-      console.log('recommendations[cartProductId]', recommendations[cartProductId])
       if (recommendations[cartProductId] && recommendations[cartProductId].length > 0) {
         recommendations[cartProductId].forEach(id => {
           if (id !== productId && !cartProductIds.has(id)) {
@@ -58,14 +49,11 @@ const getRecommendations = async (userId, productId) => {
     });
 
     finalRecommendationsId = Array.from(finalRecommendationsId);
-    console.log('finalRecommendationsId', finalRecommendationsId);
 
     finalRecommendationsId = shuffleArray(finalRecommendationsId); // shuffle the recommendations
     finalRecommendationsId = finalRecommendationsId.slice(0, 20); // take the 20 first recommendations
 
     const productRecommendations = await getProductsById(finalRecommendationsId);
-    console.log('productRecommendations', productRecommendations);
-
     return productRecommendations;
   } catch (error) {
     console.error('Error fetching recommendations:', error);
@@ -93,18 +81,15 @@ const generateDailyRecommendations = async () => {
     const allUsers = await getUsers();
 
     const globalTrends = await analyze(); // Analyze global trends once
-    console.log('globalTrends', globalTrends);
 
     let globalRecommendations = {};
 
     allProducts.forEach(product => {
       let recommendationsSet = new Set();
-      console.log("AVANT ADD GLOBAL TREND RECOMMENDATIONS")
       addTrendRecommendations(recommendationsSet, globalTrends, product, allProducts, thresholdFrequency = 30, thresholdBoughtTogether = 10, thresholdCategoryPreferences = 40); //threshold very very low to test => to change in production
       globalRecommendations[product._id] = Array.from(recommendationsSet);
     });
 
-    console.log('globalRecommendations', globalRecommendations)
     const existingGlobalRecommendation = await getRecommendationsById(global_recommendation_id);
     if (existingGlobalRecommendation.length > 0) {
       await recommendations.insert({ _id: global_recommendation_id, _rev: existingGlobalRecommendation[0]._rev, recommendations: globalRecommendations });
@@ -114,7 +99,6 @@ const generateDailyRecommendations = async () => {
 
     for (let user of allUsers) {
       const userTrends = await analyze(user._id);
-      console.log('userTrends', userTrends);
 
       let userGlobalRecommendations = {};
       userGlobalRecommendations.recommendations = {};
@@ -144,13 +128,9 @@ const analyze = async (userId = null) => {
   const productsFrequency = await getProductsFrequency(userId);
   const frequentlyBoughtTogether = await getFrequentlyBoughtTogether(userId);
   const categoryPreferences = await getCategoryPreferences(productsFrequency);
-  console.log('productsFrequency', productsFrequency);
-  console.log('frequentlyBoughtTogether', frequentlyBoughtTogether);
-  console.log('categoryPreferences', categoryPreferences);
 
   return { productsFrequency, categoryPreferences, frequentlyBoughtTogether };
 }
-
 
 const getProductsFrequency = (userId) => {
   return new Promise((resolve, reject) => {
@@ -228,7 +208,6 @@ const addTrendRecommendations = (recommendationsSet, trends, product, allProduct
       }
     });
   }
-  console.log('trends.categoryPreferences', trends.categoryPreferences[product.category]);
   if (product.category in trends.categoryPreferences && trends.categoryPreferences[product.category] > thresholdCategoryPreferences) {
 
     allProducts.filter(p => p.category === product.category && p._id !== product._id && trends.productsFrequency[p._id] > thresholdFrequency)

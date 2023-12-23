@@ -153,20 +153,24 @@ reload: full swarm-reload
 # SCALING TASKS #
 #################
 elastic-scaling-users-daemon-test: launch-elastic-scaling artillery-build
-	@echo -e "${GREEN}Running artillery test...${NC}"
+	@echo -e "${GREEN}Running users artillery test...${NC}"
 	@docker run -d --name users-load-test-$$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1) --network scapp-net scapp-artillery ./entrypoints-users.sh
 
 elastic-scaling-orders-daemon-test: launch-elastic-scaling artillery-build
-	@echo -e "${GREEN}Running artillery test...${NC}"
+	@echo -e "${GREEN}Running orders artillery test...${NC}"
 	@docker run -d --name orders-load-test-$$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1) --network scapp-net scapp-artillery ./entrypoints-orders.sh
 
 elastic-scaling-shopping-carts-daemon-test: launch-elastic-scaling artillery-build
-	@echo -e "${GREEN}Running artillery test...${NC}"
+	@echo -e "${GREEN}Running shopping-carts artillery test...${NC}"
 	@docker run -d --name carts-load-test-$$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1) --network scapp-net scapp-artillery ./entrypoints-shopping-carts.sh	
 
 elastic-scaling-products-daemon-test: launch-elastic-scaling artillery-build
-	@echo -e "${GREEN}Running artillery test...${NC}"
+	@echo -e "${GREEN}Running products artillery test...${NC}"
 	@docker run -d --name products-load-test-$$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1) --network scapp-net scapp-artillery ./entrypoints-products.sh
+
+elastic-scaling-recommendations-daemon-test: launch-elastic-scaling artillery-build
+	@echo -e "${GREEN}Running recommendations artillery test...${NC}"
+	@docker run -d --name recommendations-load-test-$$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1) --network scapp-net scapp-artillery ./entrypoints-recommendations.sh
 
 # Force pull from docker hub
 pull:

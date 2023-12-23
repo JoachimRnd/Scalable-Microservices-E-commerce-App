@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SERVICES=("scapp_users-daemon" "scapp_orders-daemon" "scapp_shopping-carts-daemon" "scapp_products-daemon" "scapp_logger-daemon")
+SERVICES=("scapp_users-daemon" "scapp_orders-daemon" "scapp_shopping-carts-daemon" "scapp_products-daemon" "scapp_logger-daemon" "scapp_recommendations-daemon" "scapp_logger-daemon")
 
 for service in "${SERVICES[@]}"; do
   (

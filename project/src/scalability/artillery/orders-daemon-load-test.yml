@@ -12,5 +12,5 @@ scenarios:
         order: test
         token: test2
         headers:
-          authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MDI0MTE0MzUsImlhdCI6MTcwMTIwMTgzNSwic3ViIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4ifQ.wWU8Xkm6lwfzJx9uLBhs2dDgNsyDFgT1hsKKzbjRIVM
+          authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MDQyMDcyOTMsImlhdCI6MTcwMjk5NzY5Mywic3ViIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4ifQ.PQNgHF9_TqNEHsotOGM7KMmQEPh2MzNFq5RFFwTuel8
 

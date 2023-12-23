@@ -13,8 +13,11 @@ ADD users-daemon-load-test.yml .
 ADD orders-daemon-load-test.yml .
 ADD shopping-carts-daemon-load-test.yml .
 ADD products-daemon-load-test.yml .
+ADD recommendations-daemon-load-test.yml .
 
 ADD entrypoints/entrypoints-users.sh .
 ADD entrypoints/entrypoints-orders.sh .
 ADD entrypoints/entrypoints-products.sh .
 ADD entrypoints/entrypoints-shopping-carts.sh .
+ADD entrypoints/entrypoints-recommendations.sh .
+

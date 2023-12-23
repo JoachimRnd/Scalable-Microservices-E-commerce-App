@@ -162,8 +162,6 @@ function createProducts() {
 				headers: { Authorization: `Bearer ${token}` },
 			};
 
-			console.log('headers', config.headers)
-
 			const bodyParameters = {
 				product: {
 					_id : product._id,
@@ -175,13 +173,9 @@ function createProducts() {
 				}
 			};
 
-			console.log('bodyParameters', bodyParameters);
-
 			const response = await axios.delete(PRODUCT_URL, { data: bodyParameters, ...config });			
 			const finalProduct = response.data.message.product;
 			
-			console.log('finalProduct', finalProduct);
-
 			update((oldProducts) => {
 				return deleteProductLocal(oldProducts, finalProduct);
 			});

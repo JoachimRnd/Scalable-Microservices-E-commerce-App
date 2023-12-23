@@ -37,22 +37,6 @@ if [ "${WITH_PERSISTENT_DATA}" != "" ]; then
       sleep 2
     done
 
-    # echo "Inserting views into the database..."
-
-    # curl --request PUT \
-    # --url ${DB_URL}/_design/products \
-    # --header 'Content-Type: application/json' \
-    # --data '{
-    #   "views": {
-    #     "getProducts": {
-    #       "map": "function (doc) { emit(doc._id, doc); }"
-    #     },
-    #     "getProductsById": {
-    #       "map": "function (doc) { if (doc._id) { emit(doc._id, doc); } }"
-    #     }
-    #   }
-    # }'
-
     echo "DB (${DB_NAME}) was created!"
 
     echo "Running db-init.js..."  

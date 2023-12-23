@@ -32,8 +32,8 @@ server.use((err, req, res, next) => {
 });
 
 cron.schedule('0 3 * * *', () => {
-  console.log("Running generate daily recommendations");  //TODO DONT RUN IF SCALABLE ==> only one have to run
-  //recommendationCrud.generateDailyRecommendations();
+  console.log("Generate Daily Recommendations")
+  recommendationCrud.generateDailyRecommendations();
 });
 
 const port = process.env.USERS_D_PORT || 80;
