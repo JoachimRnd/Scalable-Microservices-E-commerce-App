@@ -2,6 +2,7 @@
 # DOCKER_ID=
 AZURE_MANAGER=dns-weu-3-mxdx.westeurope.cloudapp.azure.com
 AZURE_MANAGER_ADMIN=maxime
+AZURE_MANAGER_IP=$(shell dig +short $(AZURE_MANAGER))
 
 # Colors                                                                                                                                                                                                       
 RED=\033[0;31m                                                                                                                                                                                                 
@@ -184,9 +185,21 @@ pull:
 	@docker pull ${DOCKER_ID}/scapp-gateway
 	@docker pull ${DOCKER_ID}/scapp-logger
 
-azure-push: full
+
+# Azure tasks
+update-service-url:
+	@echo "Updating PUBLIC_SERVICE_URL in scapp.yml..."
+	@sed -i 's|PUBLIC_SERVICE_URL=http://[^ ]*|PUBLIC_SERVICE_URL=http://$(AZURE_MANAGER_IP):80|' src/scapp.yml
+	@echo "Updating DNS name in nginx.conf..."
+	@sed -i '/upstream _gateway {/,/}/c\upstream _gateway {\n\tserver $(AZURE_MANAGER);\n\tserver gateway;\n}' src/back-end/gateway/nginx.conf
+
+azure-build: update-service-url full
+
+azure-push: update-service-url
 	@echo "${GREEN}Pushing images to azure...${NC}"
 	@scp ./src/scapp.yml ${AZURE_MANAGER_ADMIN}@${AZURE_MANAGER}:~/
 
-azure-deploy: azure-push
-	@ssh ${AZURE_MANAGER_ADMIN}@${AZURE_MANAGER} "docker stack deploy --resolve-image always -c scapp.yml scapp"
+azure-deploy: 
+	@echo "${GREEN}Deploying stack to azure...${NC}"
+	@ssh ${AZURE_MANAGER_ADMIN}@${AZURE_MANAGER} "docker stack rm scapp"
+	@ssh ${AZURE_MANAGER_ADMIN}@${AZURE_MANAGER} "DOCKER_ID=${DOCKER_ID} docker stack deploy --resolve-image always -c scapp.yml scapp"

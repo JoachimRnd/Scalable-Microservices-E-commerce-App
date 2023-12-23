@@ -40,8 +40,7 @@ services:     # list all services for your application
     image: ${DOCKER_ID}/scapp-frontend:latest
     ports: [ "3002:3000" ]
     environment:
-      - PUBLIC_SERVICE_URL=http://13.81.202.134
-      #http://192.168.56.101:80
+      - PUBLIC_SERVICE_URL=http://13.81.202.134:80
     deploy:
       # deploy 3 instances of this service
       replicas: 1
