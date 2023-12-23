@@ -183,11 +183,7 @@ const getFrequentlyBoughtTogether = (userId) => {
           if (!frequentlyBoughtTogether[productId1]) {
             frequentlyBoughtTogether[productId1] = {};
           }
-          if (!frequentlyBoughtTogether[productId2]) {
-            frequentlyBoughtTogether[productId2] = {};
-          }
           frequentlyBoughtTogether[productId1][productId2] = row.value;
-          frequentlyBoughtTogether[productId2][productId1] = row.value;
         });
         resolve(frequentlyBoughtTogether);
       } else {

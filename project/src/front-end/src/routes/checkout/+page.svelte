@@ -8,7 +8,7 @@
 
 	import { addToast } from "@stores/toasts";
 
-	let prevCheckout: any[];
+	let prevCheckout: any[] = [];
 
 	onMount(async () => {
 		try {
@@ -17,7 +17,7 @@
 			let localUser = window.localStorage.getItem("auth");
 			const token = JSON.parse(localUser).token;
 
-			const response = await axios.get(`${url}/orders/user/orders`, {
+			const response = await axios.get(`${url}/orders`, {
 				headers: { Authorization: `Bearer ${token}` },
 			});
 
@@ -54,9 +54,7 @@
 							  };
 					}),
 				}));
-			} else {
-				prevCheckout = [];
-			}
+			} 
 		} catch (error) {
 			console.error("Error fetching user orders:", error);
 			addToast({
@@ -99,7 +97,7 @@
 
 		//Adding order in orders-db
 		axios
-			.post(`${url}/orders/checkout`, bodyParameters, config)
+			.post(`${url}/orders`, bodyParameters, config)
 			.then((res) => {
 				addToast({
 					message: "Order completed",

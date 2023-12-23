@@ -7,7 +7,7 @@ const loggerCrud = require('../utils/crud/crud-logger');
 
 module.exports = (orderCrud) => {
 
-  router.post('/checkout', authMiddleware, (req, res) => {
+  router.post('/', authMiddleware, (req, res) => {
     const order = req.body.order;
     const userId = req.userId;
     order.userId = userId;
@@ -28,7 +28,7 @@ module.exports = (orderCrud) => {
         });
   });
 
-  router.get('/user/orders', authMiddleware, (req, res) => {
+  router.get('/', authMiddleware, (req, res) => {
     const userId = req.userId;
 
     orderCrud.getOrdersByUserId(userId)
