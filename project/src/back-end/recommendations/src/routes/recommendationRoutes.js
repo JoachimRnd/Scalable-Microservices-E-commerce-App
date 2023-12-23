@@ -8,11 +8,11 @@ const loggerCrud = require('../utils/crud/crud-logger');
 module.exports = (recommendationCrud) => {
 
   // useful for test => to remove in production
-  router.get('/launchDailyRecommendation', (req, res) => {
+  router.get('/launchDailyRecommendations', (req, res) => {
     try {
       recommendationCrud.generateDailyRecommendations();
       loggerCrud.info('Daily recommendations generated', {}, req)
-      return res.status(200).json({ status: 'success', data: "Daily recommendations generated" })
+      return res.status(200).json({ status: 'success', message: "Daily recommendations generated" })
     } catch (err) {
       loggerCrud.error('Error generating daily recommendations', {}, err);
       console.error('Error generating daily recommendations', err);
