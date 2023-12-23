@@ -1,4 +1,5 @@
 const products = require('nano')(process.env.DB_URL);
+const { v4: uuidv4 } = require('uuid');
 
 const { BlobServiceClient } = require('@azure/storage-blob');
 
@@ -12,16 +13,14 @@ const createProduct = (product, req) => {
   const imageUrl = product.image;
   const imagePath = path.resolve(__dirname, 'images', `${product._id}.png`);
   return downloadImage(imageUrl, imagePath)
-    .then(() => {
+    .then(() => uploadImageToBlobStorage(imagePath, product, req))
+    .then((updatedProduct) => {
       return new Promise((resolve, reject) => {
         products.insert(
-          product,
+          updatedProduct,
           (error, success) => {
             if (success) {
-              const productWithId = { ...product, _id: success.id, _rev: success.rev };
-              uploadImageToBlobStorage(imagePath, productWithId._id, req)
-                .then(() => resolve({product : productWithId}))
-                .catch(reject);
+              resolve({product : {...updatedProduct, _id: success.id, _rev: success.rev}});
             } else {
               reject(new Error(`Error creating a product. Reason: ${error.reason}.`));
             }
@@ -35,15 +34,14 @@ const updateProduct = (product, req) => {
   const imageUrl = product.image;
   const imagePath = path.resolve(__dirname, 'images', `${product._id}.png`);
   return downloadImage(imageUrl, imagePath)
-    .then(() => {
+    .then(() => uploadImageToBlobStorage(imagePath, product, req))
+    .then((updatedProduct) => {
       return new Promise((resolve, reject) => {
         products.insert(
-          product,
+          updatedProduct,
           (error, success) => {
             if (success) {
-              uploadImageToBlobStorage(imagePath, product._id, req)
-                .then(() => resolve({product : product}))
-                .catch(reject);
+              resolve({product : updatedProduct});
             } else {
               reject(new Error(`Error updating a product. Reason: ${error.reason}.`));
             }
@@ -52,7 +50,6 @@ const updateProduct = (product, req) => {
       });
     });
 }
-
 const downloadImage = (url, path) => {
   return axios({
     url,
@@ -68,9 +65,9 @@ const downloadImage = (url, path) => {
   );
 }
 
-const uploadImageToBlobStorage = (imagePath, productId, req) => {
+const uploadImageToBlobStorage = (imagePath, product, req) => {
   return new Promise((resolve, reject) => {
-    const blobName = `${productId}.png`;
+    const blobName = uuidv4() + '.png';
     const containerClient = blobService.getContainerClient('scapp-product');
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
@@ -81,7 +78,8 @@ const uploadImageToBlobStorage = (imagePath, productId, req) => {
             console.error(`Error deleting file ${imagePath}.`, err);
           }
         });
-        resolve();
+        product.image = blockBlobClient.url;
+        resolve(product);
       })
       .catch(reject);
   });
