@@ -48,6 +48,7 @@ services:     # list all services for your application
         # restart if something went wrong
         condition: on-failure
     networks: [ "scapp-net" ]
+    depends_on: [ "gateway" ]
   
 
   #########
@@ -182,6 +183,7 @@ services:     # list all services for your application
       - GATEWAY_HOST=gateway            # name of container running gateway
       - ADMIN_NAME=admin
       - ADMIN_PASSW=admin
+      - AZURE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=scapplinfo2145;AccountKey=4ncIZul7Nq8TpyZzGse7fid1Y9cV4iEEzpVW78kavIUJHyAGzB/0NMWpJxbjbHAjWLuI0URSUF8a+ASt6eMkNg==;EndpointSuffix=core.windows.net
     deploy:
       replicas: 1
       restart_policy:
@@ -249,13 +251,6 @@ services:     # list all services for your application
         constraints:
           - node.role == manager
     networks: [ "scapp-net" ]
-    depends_on: 
-      - users-daemon
-      - orders-daemon
-      - shopping-carts-daemon
-      - products-daemon
-      - logger-daemon
-      - recommendations-daemon
 
   ##############
   # visualizer #

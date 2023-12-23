@@ -1,5 +1,5 @@
 # Variables  
-# DOCKER_ID=
+DOCKER_ID=mxdx02
 AZURE_MANAGER=dns-weu-3-mxdx.westeurope.cloudapp.azure.com
 AZURE_MANAGER_ADMIN=maxime
 AZURE_MANAGER_IP=$(shell dig +short $(AZURE_MANAGER))
@@ -34,6 +34,7 @@ products: products-build products-push
 shopping-carts: shopping-carts-build shopping-carts-push
 recommendations: recommendations-build recommendations-push
 logger: logger-build logger-push
+azure: azure-build azure-push azure-deploy
 
 ###############                                                                                                                                                                                                               
 # Small tasks #

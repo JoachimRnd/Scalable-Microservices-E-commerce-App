@@ -3,28 +3,28 @@
         "name": "Brocolli",
         "price": 2.73,
         "image":
-            "https://res.cloudinary.com/sivadass/image/upload/v1493620046/dummy-products/broccoli.jpg",
+            "https://scapplinfo2145.blob.core.windows.net/scapp-product/broccoli.jpg",
         "category": "Vegetables"
     },
     {
         "name": "Cauliflower",
         "price": 6.3,
         "image":
-            "https://res.cloudinary.com/sivadass/image/upload/v1493620046/dummy-products/cauliflower.jpg",
+            "https://scapplinfo2145.blob.core.windows.net/scapp-product/cauliflower.jpg",
         "category": "Vegetables"
     },
     {
         "name": "Cucumber",
         "price": 5.6,
         "image":
-            "https://res.cloudinary.com/sivadass/image/upload/v1493620046/dummy-products/cucumber.jpg",
+            "https://scapplinfo2145.blob.core.windows.net/scapp-product/cucumber.jpg",
         "category": "Vegetables"
     },
     {
         "name": "Beetroot",
         "price": 8.7,
         "image":
-            "https://res.cloudinary.com/sivadass/image/upload/v1493620045/dummy-products/beetroot.jpg",
+            "https://scapplinfo2145.blob.core.windows.net/scapp-product/beetroot.jpg",
         "category": "Vegetables"
     }
     ,
@@ -32,28 +32,28 @@
         "name": "Apple",
         "price": 2.34,
         "image":
-            "https://res.cloudinary.com/sivadass/image/upload/v1493620045/dummy-products/apple.jpg",
+            "https://scapplinfo2145.blob.core.windows.net/scapp-product/apple.jpg",
         "category": "Fruits"
     },
     {
         "name": "Banana",
         "price": 1.69,
         "image":
-            "https://res.cloudinary.com/sivadass/image/upload/v1493620045/dummy-products/banana.jpg",
+            "https://scapplinfo2145.blob.core.windows.net/scapp-product/banana.jpg",
         "category": "Fruits"
     },
     {
         "name": "Grapes",
         "price": 5.98,
         "image":
-            "https://res.cloudinary.com/sivadass/image/upload/v1493620045/dummy-products/grapes.jpg",
+            "https://scapplinfo2145.blob.core.windows.net/scapp-product/grapes.jpg",
         "category": "Fruits"
     },
     {
         "name": "Mango",
         "price": 6.8,
         "image":
-            "https://res.cloudinary.com/sivadass/image/upload/v1493620045/dummy-products/mango.jpg",
+            "https://scapplinfo2145.blob.core.windows.net/scapp-product/mango.jpg",
         "category": "Fruits"
     }
 ]

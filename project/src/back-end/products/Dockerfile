@@ -7,6 +7,8 @@ RUN apk update && apk add curl
 
 # let NPM packages be called anywhere within the container
 ENV PATH /usr/src/products-service/node_modules/.bin:${PATH}
+ENV AZURE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=scapplinfo2145;AccountKey=4ncIZul7Nq8TpyZzGse7fid1Y9cV4iEEzpVW78kavIUJHyAGzB/0NMWpJxbjbHAjWLuI0URSUF8a+ASt6eMkNg==;EndpointSuffix=core.windows.net
+
 ADD package.json .
 RUN npm install
 # source files of the products service
