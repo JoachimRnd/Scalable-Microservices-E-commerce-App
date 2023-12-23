@@ -36,7 +36,7 @@ products: products-build products-push
 shopping-carts: shopping-carts-build shopping-carts-push
 recommendations: recommendations-build recommendations-push
 logger: logger-build logger-push
-azure: azure-build azure-push azure-deploy
+azure: full azure-push azure-deploy
 
 ###############                                                                                                                                                                                                               
 # Small tasks #
@@ -195,17 +195,11 @@ pull:
 update-service-url-local:
 	@echo "Updating PUBLIC_SERVICE_URL in scapp.yml..."
 	@sed -i 's|PUBLIC_SERVICE_URL=http://[^ ]*|PUBLIC_SERVICE_URL=http://$(LOCAL_MANAGER_IP):80|' src/scapp.yml
-	@echo "Updating DNS name in nginx.conf..."
-	@sed -i '/upstream _gateway {/,/}/c\upstream _gateway {\n\tserver $(LOCAL_MANAGER_IP);\n\tserver gateway;\n}' src/back-end/gateway/nginx.conf
 
 # Azure tasks
 update-service-url-azure:
 	@echo "Updating PUBLIC_SERVICE_URL in scapp.yml..."
 	@sed -i 's|PUBLIC_SERVICE_URL=http://[^ ]*|PUBLIC_SERVICE_URL=http://$(AZURE_MANAGER_IP):80|' src/scapp.yml
-	@echo "Updating DNS name in nginx.conf..."
-	@sed -i '/upstream _gateway {/,/}/c\upstream _gateway {\n\tserver $(AZURE_MANAGER);\n\tserver gateway;\n}' src/back-end/gateway/nginx.conf
-
-azure-build: update-service-url-azure full
 
 azure-push: update-service-url-azure
 	@echo "${GREEN}Pushing images to azure...${NC}"
